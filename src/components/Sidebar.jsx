@@ -130,8 +130,8 @@ const Sidebar = ({ isOpen, toggle }) => {
             </button>
 
             <motion.div
-                initial={{ x: -300 }}
-                animate={{ x: isOpen ? 0 : -300 }}
+                initial={{ x: "-100%" }}
+                animate={{ x: isOpen ? 0 : "-100%" }}
                 transition={{ type: "tween", duration: 0.3, ease: "easeOut" }}
                 className="sidebar-container"
             >
