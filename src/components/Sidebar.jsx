@@ -136,7 +136,7 @@ const Sidebar = ({ isOpen, toggle }) => {
                     >
                         <ArrowLeftToLine size={24} />
                     </button>
-                    <span className="sidebar-app-name">Bitzme</span>
+                    <span className="sidebar-app-name">Nue</span>
                 </div>
 
                 <div className="sidebar-content">
