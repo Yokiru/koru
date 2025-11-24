@@ -80,6 +80,30 @@ const Result = () => {
         fetchQuiz();
     }, [cards, quizMode, query, quizQuestions.length]);
 
+    const maintainHistoryLimit = async () => {
+        try {
+            // Fetch IDs of all items, ordered by newest first
+            const { data } = await supabase
+                .from('history')
+                .select('id')
+                .order('created_at', { ascending: false });
+
+            if (data && data.length > 10) {
+                // Keep the first 10, delete the rest
+                const itemsToDelete = data.slice(10).map(item => item.id);
+
+                if (itemsToDelete.length > 0) {
+                    await supabase
+                        .from('history')
+                        .delete()
+                        .in('id', itemsToDelete);
+                }
+            }
+        } catch (e) {
+            console.error("Failed to maintain history limit", e);
+        }
+    };
+
     const saveToHistory = async (query, content) => {
         try {
             // Check if already exists
@@ -105,6 +129,9 @@ const Result = () => {
                     ]);
                 if (error) throw error;
             }
+
+            // Enforce limit
+            await maintainHistoryLimit();
 
             // Trigger update in Sidebar
             window.dispatchEvent(new Event('historyUpdated'));
