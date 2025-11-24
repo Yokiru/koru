@@ -26,17 +26,31 @@ export const generateExplanation = async (topic) => {
         const text = await callGeminiAPI('explanation', { topic });
         console.log("Gemini Raw Response:", text);
 
-        const jsonMatch = text.match(/\[.*\]/s);
+        // Match JSON object instead of array
+        const jsonMatch = text.match(/\{.*\}/s);
         const jsonString = jsonMatch ? jsonMatch[0] : text;
 
         try {
-            return JSON.parse(jsonString);
+            const data = JSON.parse(jsonString);
+            // Check if it has the expected structure
+            if (data.cleanTopic && Array.isArray(data.cards)) {
+                return data;
+            }
+            // Fallback if it returns just an array (legacy support or hallucination)
+            if (Array.isArray(data)) {
+                return { cleanTopic: topic, cards: data };
+            }
+            throw new Error("Invalid response format");
         } catch (e) {
             console.warn("JSON Parse failed, falling back to text", e);
-            return [{
-                title: "Explanation",
-                content: text.replace(/```json/g, '').replace(/```/g, '')
-            }];
+            // Fallback structure
+            return {
+                cleanTopic: topic,
+                cards: [{
+                    title: "Explanation",
+                    content: text.replace(/```json/g, '').replace(/```/g, '')
+                }]
+            };
         }
     } catch (error) {
         console.error("Error generating explanation:", error);

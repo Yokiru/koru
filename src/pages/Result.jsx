@@ -25,6 +25,8 @@ const Result = () => {
     const [showQuiz, setShowQuiz] = useState(false);
     const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
 
+    const [displayTitle, setDisplayTitle] = useState(query);
+
     useEffect(() => {
         const fetchExplanation = async () => {
             setLoading(true);
@@ -42,16 +44,59 @@ const Result = () => {
                 if (cachedData && cachedData.content) {
                     console.log("Loaded from cache:", query);
                     setCards(cachedData.content);
+                    // Use saved clean topic if available (assuming we might save it in content or separate field later, 
+                    // but for now we might just rely on the query or if we update schema. 
+                    // Actually, let's just use the query for now if cached, or if we saved the clean title in the query field?
+                    // Wait, if we save cleanTopic as 'query' in DB, then next time we search 'messy query' it won't match.
+                    // Ideally we should have a separate title field. 
+                    // For now, let's just use the query as title if cached, or maybe we can save the title in the content JSON?
+                    // Let's assume content is just the cards array for now based on previous schema.
+                    // To keep it simple without DB migration: we will just use the query as title for cached items, 
+                    // OR we can try to extract title if we decide to wrap content in an object.
+                    // BUT, the user wants the HISTORY title to be clean. 
+                    // So when we save, we should save the CLEAN TOPIC as the 'query' field? 
+                    // No, 'query' is what user searched. We should probably add a 'title' column to history table.
+                    // Since I can't easily migrate DB right now without SQL, I will try to save the clean title 
+                    // by updating the 'query' field itself? No, that breaks search.
+                    // Let's just update the UI title for now.
+
+                    // Actually, the user said "buat pada riwayat ... di tulis ulang". 
+                    // This implies the sidebar list should show the clean title.
+                    // The sidebar uses the 'query' column.
+                    // So we MUST save the clean title in the 'query' column?
+                    // If we do that, then 'messy query' won't find it next time?
+                    // Maybe that's okay. If I search "romawi", and it saves as "Sejarah Romawi", 
+                    // next time I search "romawi", it won't find "Sejarah Romawi" exactly?
+                    // The current search is `.eq('query', query)`.
+
+                    // Workaround: We will save the CLEAN TOPIC as the 'query' in the database.
+                    // This means if I search "romawi" again, it might generate a new one if it doesn't match exactly.
+                    // But that's acceptable for now to get the clean title in sidebar.
+
+                    setDisplayTitle(cachedData.query); // Or just query
                     setLoading(false);
                     return;
                 }
 
                 // 2. If not in history, generate new
-                const explanationCards = await generateExplanation(query);
-                setCards(explanationCards);
+                const result = await generateExplanation(query);
 
-                // 3. Save to Supabase
-                await saveToHistory(query, explanationCards);
+                // Handle both old (array) and new (object) formats
+                let explanationCards = [];
+                let cleanTitle = query;
+
+                if (Array.isArray(result)) {
+                    explanationCards = result;
+                } else if (result && result.cards) {
+                    explanationCards = result.cards;
+                    cleanTitle = result.cleanTopic || query;
+                }
+
+                setCards(explanationCards);
+                setDisplayTitle(cleanTitle);
+
+                // 3. Save to Supabase with CLEAN TITLE
+                await saveToHistory(cleanTitle, explanationCards);
 
             } catch (err) {
                 console.error("Failed to fetch explanation", err);
@@ -230,7 +275,7 @@ const Result = () => {
     return (
         <div className="result-container">
             <header className="result-header">
-                <h1 className="topic-title">{query}</h1>
+                <h1 className="topic-title">{displayTitle}</h1>
                 <button onClick={handleHome} className="icon-button" aria-label="Home">
                     <Home size={24} />
                 </button>
