@@ -1,0 +1,83 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+export default async function handler(req, res) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const { action, payload } = req.body;
+    const API_KEY = process.env.GEMINI_API_KEY;
+
+    if (!API_KEY) {
+        return res.status(500).json({ error: 'Server configuration error: Missing API Key' });
+    }
+
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+    try {
+        let prompt = "";
+
+        if (action === 'explanation') {
+            const { topic } = payload;
+            prompt = `
+              Explain "${topic}" in a simple, engaging way for a learner. 
+              Break it down into 3-5 distinct parts or steps.
+              Return ONLY a JSON array of objects, where each object has a "title" and "content" property.
+              Example format:
+              [
+                { "title": "Introduction", "content": "..." },
+                { "title": "Key Concept", "content": "..." }
+              ]
+              Do not include markdown formatting like \`\`\`json. Just the raw JSON string.
+            `;
+        } else if (action === 'clarification') {
+            const { topic, confusion } = payload;
+            prompt = `
+              The user is learning about "${topic}" and is confused about: "${confusion}".
+              Provide a specific clarification to help them understand.
+              Return ONLY a JSON object with "title" and "content".
+              Example format:
+              { "title": "Clarification", "content": "..." }
+              Do not include markdown formatting.
+            `;
+        } else if (action === 'quiz') {
+            const { topic, numQuestions } = payload;
+            prompt = `
+              Create ${numQuestions || 3} quiz questions about "${topic}" for a learner.
+              Mix multiple choice and true/false questions.
+              Return ONLY a JSON array of question objects.
+              Each object must have:
+              - "question": the question text
+              - "type": either "multiple_choice" or "true_false"
+              - "options": array of answer options (4 for multiple choice, 2 for true/false: ["True", "False"])
+              - "correctAnswer": the correct option (exact match from options array)
+              - "explanation": brief explanation of why the answer is correct
+              
+              Example format:
+              [
+                {
+                  "question": "What is photosynthesis?",
+                  "type": "multiple_choice",
+                  "options": ["A process plants use to make food", "A type of cell", "A chemical reaction", "An animal behavior"],
+                  "correctAnswer": "A process plants use to make food",
+                  "explanation": "Photosynthesis is the process by which plants convert light energy into chemical energy (food)."
+                }
+              ]
+              Do not include markdown formatting. Just the raw JSON array.
+            `;
+        } else {
+            return res.status(400).json({ error: 'Invalid action' });
+        }
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        return res.status(200).json({ text });
+
+    } catch (error) {
+        console.error("Gemini API Error:", error);
+        return res.status(500).json({ error: 'Failed to generate content' });
+    }
+}
