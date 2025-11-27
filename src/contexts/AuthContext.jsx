@@ -124,47 +124,33 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        try {
-            console.log('Logout started');
-            setLoading(true);
+        console.log('Logout started');
 
+        // Clear state immediately
+        setUser(null);
+        setProfile(null);
+        setSession(null);
+
+        try {
             // Set a timeout to force logout if Supabase takes too long
             const timeoutPromise = new Promise((resolve) => {
                 setTimeout(() => {
                     console.log('Logout timeout - forcing local logout');
                     resolve({ error: null });
-                }, 3000); // 3 second timeout
+                }, 2000); // 2 second timeout
             });
 
             const signOutPromise = authService.signOut();
 
             // Race between actual signOut and timeout
-            const { error } = await Promise.race([signOutPromise, timeoutPromise]);
+            await Promise.race([signOutPromise, timeoutPromise]);
 
-            if (error) {
-                console.error("Logout error:", error);
-                // Continue to clear local state anyway
-            }
-
-            console.log('Logout completed, clearing state');
-            return { success: true, error: null };
+            console.log('Logout completed from Supabase');
         } catch (error) {
             console.error("Logout exception:", error);
-            return { success: false, error };
-        } finally {
-            // Always clear local state
-            console.log('Clearing user state');
-            setUser(null);
-            setProfile(null);
-            setSession(null);
-            setLoading(false);
-            console.log('Logout finished');
-
-            // Force redirect to login page
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 100);
         }
+
+        console.log('Logout finished - state cleared');
     };
 
     const updateProfile = async (updates) => {
