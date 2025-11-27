@@ -6,14 +6,22 @@ import './Sidebar.css';
 import { supabase } from '../services/supabase';
 import ProfileSection from './ProfileSection';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Sidebar = ({ isOpen, toggle }) => {
     const [history, setHistory] = useState([]);
     const navigate = useNavigate();
     const { t } = useLanguage();
+    const { isAuthenticated } = useAuth();
 
     useEffect(() => {
         const loadHistory = async () => {
+            // Only load history if user is authenticated
+            if (!isAuthenticated) {
+                setHistory([]);
+                return;
+            }
+
             try {
                 const { data, error } = await supabase
                     .from('history')
@@ -25,7 +33,6 @@ const Sidebar = ({ isOpen, toggle }) => {
                 setHistory(data || []);
             } catch (e) {
                 console.error("Failed to load history", e);
-                // Set empty history on error (e.g., guest user)
                 setHistory([]);
             }
         };
@@ -47,7 +54,7 @@ const Sidebar = ({ isOpen, toggle }) => {
             supabase.removeChannel(channel);
             window.removeEventListener('historyUpdated', loadHistory);
         };
-    }, []);
+    }, [isAuthenticated]);
 
     const handleDelete = async (e, itemToDelete) => {
         e.stopPropagation();
