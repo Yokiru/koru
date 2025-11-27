@@ -4,95 +4,59 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp, Brain } from 'lucide-react';
 import './Home.css';
 import { useLanguage } from '../contexts/LanguageContext';
-
-
-
-
+import { useAuth } from '../contexts/AuthContext';
 
 const Home = ({ isSidebarOpen }) => {
     const { t, language } = useLanguage();
+    const { isAuthenticated } = useAuth();
     const [greeting, setGreeting] = useState("");
     const [query, setQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [quizMode, setQuizMode] = useState(false);
+    const [showTrialModal, setShowTrialModal] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         const greetings = t('home.greetings');
-        // Ensure greetings is an array before accessing
         const greetingList = Array.isArray(greetings) ? greetings : [greetings];
         const randomGreeting = greetingList[Math.floor(Math.random() * greetingList.length)];
         setGreeting(randomGreeting);
 
-        // Generate smart suggestions
-        try {
-            const history = JSON.parse(localStorage.getItem('learn_history') || '[]');
-            // Extract queries from object-based history
-            const historyQueries = history.map(item => typeof item === 'object' ? item.query : item);
-            const smartSuggestions = getSmartSuggestions(historyQueries);
-            setSuggestions(smartSuggestions);
-        } catch (e) {
-            console.error("Failed to load history for suggestions", e);
-            const defaultSuggestions = t('home.suggestions');
-            const suggestionsList = Array.isArray(defaultSuggestions) ? defaultSuggestions : [];
-            setSuggestions(suggestionsList.slice(0, 5));
-        }
-    }, [language, t]); // Re-run when language changes
+        // Generate smart suggestions - only show defaults for now
+        const defaultSuggestions = t('home.suggestions');
+        const suggestionsList = Array.isArray(defaultSuggestions) ? defaultSuggestions : [];
+        const shuffled = [...suggestionsList].sort(() => 0.5 - Math.random());
+        setSuggestions(shuffled.slice(0, 5));
+    }, [language, t]);
 
-    const getSmartSuggestions = (history) => {
-        let newSuggestions = new Set();
+    const checkTrialLimit = () => {
+        if (isAuthenticated) return true;
 
-        // 1. Try to find related topics based on history
-        const topicMap = t('home.topic_map');
-        // Ensure topicMap is an object
-        if (topicMap && typeof topicMap === 'object') {
-            history.forEach(item => {
-                const lowerItem = item.toLowerCase();
-                Object.keys(topicMap).forEach(key => {
-                    if (lowerItem.includes(key)) {
-                        const topics = topicMap[key];
-                        if (Array.isArray(topics)) {
-                            topics.forEach(topic => newSuggestions.add(topic));
-                        }
-                    }
-                });
-            });
+        const trialUsed = localStorage.getItem('guest_trial_used');
+        if (trialUsed === 'true') {
+            setShowTrialModal(true);
+            return false;
         }
 
-        // 2. Convert to array
-        let suggestionArray = Array.from(newSuggestions);
-
-        // 3. Fill with defaults if we don't have enough (target 5)
-        if (suggestionArray.length < 5) {
-            const defaultSuggestions = t('home.suggestions');
-            const suggestionsList = Array.isArray(defaultSuggestions) ? defaultSuggestions : [];
-            const shuffledDefaults = [...suggestionsList].sort(() => 0.5 - Math.random());
-            for (let item of shuffledDefaults) {
-                if (!suggestionArray.includes(item)) {
-                    suggestionArray.push(item);
-                }
-                if (suggestionArray.length >= 5) break;
-            }
-        }
-
-        // 4. Shuffle final result and take top 5
-        return suggestionArray.sort(() => 0.5 - Math.random()).slice(0, 5);
+        // Mark trial as used
+        localStorage.setItem('guest_trial_used', 'true');
+        return true;
     };
 
     const handleSearch = (e) => {
         e.preventDefault();
         if (query.trim()) {
-            // Don't save to history here, let Result page handle it after generation
-            navigate('/result', { state: { query, quizMode } });
+            if (checkTrialLimit()) {
+                navigate('/result', { state: { query, quizMode } });
+            }
         }
     };
 
     const handleSuggestionClick = (suggestion) => {
-        // Don't save to history here, let Result page handle it after generation
-        navigate('/result', { state: { query: suggestion, quizMode } });
+        if (checkTrialLimit()) {
+            navigate('/result', { state: { query: suggestion, quizMode } });
+        }
     };
-
-
 
     return (
         <div className="home-container">
@@ -104,7 +68,6 @@ const Home = ({ isSidebarOpen }) => {
             >
                 {greeting}
             </motion.h1>
-
 
             <motion.form
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -119,7 +82,6 @@ const Home = ({ isSidebarOpen }) => {
                         value={query}
                         onChange={(e) => {
                             setQuery(e.target.value);
-                            // Auto-resize textarea
                             e.target.style.height = 'auto';
                             e.target.style.height = e.target.scrollHeight + 'px';
                         }}
@@ -170,6 +132,36 @@ const Home = ({ isSidebarOpen }) => {
                     </button>
                 ))}
             </motion.div>
+
+            {/* Trial Limit Modal */}
+            {showTrialModal && (
+                <div className="modal-overlay" onClick={() => setShowTrialModal(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h2>🎓 Ready to Learn More?</h2>
+                        <p>You've used your free trial! Sign in to continue learning without limits.</p>
+                        <div className="modal-actions">
+                            <button
+                                className="modal-button primary"
+                                onClick={() => navigate('/login')}
+                            >
+                                Sign In
+                            </button>
+                            <button
+                                className="modal-button secondary"
+                                onClick={() => navigate('/register')}
+                            >
+                                Create Account
+                            </button>
+                        </div>
+                        <button
+                            className="modal-close"
+                            onClick={() => setShowTrialModal(false)}
+                        >
+                            ×
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

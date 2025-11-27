@@ -25,52 +25,12 @@ const Sidebar = ({ isOpen, toggle }) => {
                 setHistory(data || []);
             } catch (e) {
                 console.error("Failed to load history", e);
+                // Set empty history on error (e.g., guest user)
+                setHistory([]);
             }
         };
 
-        const migrateHistory = async () => {
-            const localHistory = localStorage.getItem('learn_history');
-            const isMigrated = localStorage.getItem('supabase_migrated');
-
-            if (localHistory && !isMigrated) {
-                try {
-                    const parsed = JSON.parse(localHistory);
-                    // Filter valid items
-                    const validItems = parsed.filter(item => item.query && item.content);
-
-                    if (validItems.length > 0) {
-                        // Prepare data for insertion
-                        const itemsToInsert = validItems.map(item => ({
-                            query: item.query,
-                            content: item.content,
-                            // Use current time if timestamp is missing or invalid
-                            created_at: item.timestamp || new Date().toISOString()
-                        }));
-
-                        const { error } = await supabase
-                            .from('history')
-                            .insert(itemsToInsert);
-
-                        if (!error) {
-                            console.log("Migration successful");
-                            localStorage.setItem('supabase_migrated', 'true');
-                            loadHistory(); // Reload after migration
-                        } else {
-                            console.error("Migration failed", error);
-                        }
-                    } else {
-                        // No valid items to migrate, mark as done
-                        localStorage.setItem('supabase_migrated', 'true');
-                    }
-                } catch (e) {
-                    console.error("Migration error", e);
-                }
-            } else {
-                loadHistory();
-            }
-        };
-
-        migrateHistory();
+        loadHistory();
 
         // Subscribe to realtime changes
         const channel = supabase

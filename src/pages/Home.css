@@ -213,3 +213,107 @@
 [data-theme="light"] .suggestion-chip:hover {
     background-color: rgba(0, 0, 0, 0.05);
 }
+
+/* Trial Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h2 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+}
+
+.modal-content p {
+    margin: 0 0 1.5rem 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-direction: column;
+}
+
+.modal-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.modal-button.primary {
+    background: var(--accent);
+    color: var(--bg-primary);
+}
+
+.modal-button.primary:hover {
+    background: rgba(247, 111, 83, 0.8);
+    transform: translateY(-1px);
+}
+
+.modal-button.secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] .modal-button.secondary {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.modal-button.secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .modal-button.secondary:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s;
+}
+
+.modal-close:hover {
+    color: var(--text-primary);
+}
