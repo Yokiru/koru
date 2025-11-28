@@ -142,7 +142,7 @@ const ProfileSection = () => {
                     </div>
                     <div className="profile-info">
                         <div className="profile-name">{displayName}</div>
-                        <div className="profile-email">{profile?.subscription_plan || 'Free plan'}</div>
+                        <div className="profile-email">{email}</div>
                     </div>
                 </div>
             </div>
