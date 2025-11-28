@@ -6,7 +6,6 @@ import './Login.css';
 const Login = () => {
     const navigate = useNavigate();
     const { login, loading } = useAuth();
-    console.log('Login render: loading =', loading);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -25,7 +24,6 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Login submit');
         setError('');
 
         if (!formData.email || !formData.password) {
@@ -38,12 +36,9 @@ const Login = () => {
             return;
         }
 
-        console.log('Calling login function...');
         const { success, error: loginError } = await login(formData.email, formData.password);
-        console.log('Login function returned:', { success, loginError });
 
         if (success) {
-            console.log('Navigating to /');
             navigate('/');
         } else {
             setError(loginError?.message || 'Failed to login. Please check your credentials.');
