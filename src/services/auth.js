@@ -112,13 +112,19 @@ export const authService = {
      */
     async getCurrentUser() {
         try {
+            console.log('🕵️ authService: getCurrentUser calling getUser()');
             const { data: { user }, error } = await supabase.auth.getUser();
+            console.log('🕵️ authService: getUser() result', { hasUser: !!user, error });
+
             if (error) throw error;
 
+            console.log('🕵️ authService: getCurrentUser calling getSession()');
             const { data: { session } } = await supabase.auth.getSession();
+            console.log('🕵️ authService: getSession() result', { hasSession: !!session });
 
             return { user, session, error: null };
         } catch (error) {
+            console.error('🕵️ authService: getCurrentUser error', error);
             return { user: null, session: null, error };
         }
     },
