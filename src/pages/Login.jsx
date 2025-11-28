@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Home } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import './Login.css';
 
@@ -47,6 +48,9 @@ const Login = () => {
 
     return (
         <div className="auth-container">
+            <Link to="/" className="back-to-home-fixed">
+                <Home size={20} />
+            </Link>
             <div className="auth-header-outside">
                 <h1 className="auth-logo-large">Welcome to Nue</h1>
                 <p className="auth-subtitle-large">Sign in to continue your learning journey</p>

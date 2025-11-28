@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Check, X } from 'lucide-react';
+import { Eye, EyeOff, Check, X, Home } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/auth';
 import './Register.css';
@@ -164,6 +164,9 @@ const Register = () => {
 
     return (
         <div className="auth-container">
+            <Link to="/" className="back-to-home-fixed">
+                <Home size={20} />
+            </Link>
             <div className="auth-header-outside">
                 <h1 className="auth-logo-large">{registrationSuccess ? "Check your email!" : getStepTitle()}</h1>
                 <p className="auth-subtitle-large">{registrationSuccess ? `We've sent a confirmation link to ${formData.email}` : getStepSubtitle()}</p>
