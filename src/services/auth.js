@@ -140,10 +140,22 @@ export const authService = {
             // Fallback: try getSession if getUser fails/times out
             try {
                 console.log('🕵️ authService: Fallback to getSession');
-                const { data: { session } } = await supabase.auth.getSession();
+
+                // Also race getSession against timeout
+                const sessionTimeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Session Timeout')), 2000)
+                );
+
+                const { data: { session } } = await Promise.race([
+                    supabase.auth.getSession(),
+                    sessionTimeoutPromise
+                ]);
+
+                console.log('🕵️ authService: Fallback getSession result', { hasSession: !!session });
                 return { user: session?.user || null, session, error: null };
             } catch (sessionError) {
-                return { user: null, session: null, error };
+                console.error('🕵️ authService: Fallback getSession error', sessionError);
+                return { user: null, session: null, error: sessionError };
             }
         }
     },
