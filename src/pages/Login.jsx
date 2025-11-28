@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './Login.css';
 
+import { supabase } from '../services/supabase';
+
 const Login = () => {
     const navigate = useNavigate();
     const { login, loading } = useAuth();
@@ -21,6 +23,22 @@ const Login = () => {
             [e.target.name]: e.target.value,
         });
         setError('');
+    };
+
+    const checkConnection = async () => {
+        console.log('Checking connection...');
+        try {
+            const { count, error } = await supabase
+                .from('user_profiles')
+                .select('*', { count: 'exact', head: true });
+
+            if (error) throw error;
+            console.log('Connection check passed:', count);
+            alert('Connection to Supabase is OK! ✅');
+        } catch (err) {
+            console.error('Connection check failed:', err);
+            alert(`Connection Failed ❌: ${err.message}`);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -97,6 +115,13 @@ const Login = () => {
                 </form>
 
                 <div className="auth-footer">
+                    <button
+                        type="button"
+                        onClick={checkConnection}
+                        className="text-xs text-gray-500 hover:text-gray-300 mb-4 underline"
+                    >
+                        Check Connection
+                    </button>
                     <p>
                         Don't have an account?{' '}
                         <Link to="/register" className="auth-link">

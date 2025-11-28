@@ -73,35 +73,6 @@ export const authService = {
 
     /**
      * Sign in existing user
-     * @param {string} email - User email
-     * @param {string} password - User password
-     * @returns {Promise<{user, error}>}
-     */
-    async signIn(email, password) {
-        try {
-            // Create a timeout promise
-            const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Sign In Timeout')), 10000) // 10s timeout for login
-            );
-
-            const { data, error } = await Promise.race([
-                supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                }),
-                timeoutPromise
-            ]);
-
-            if (error) throw error;
-
-            return { user: data.user, session: data.session, error: null };
-        } catch (error) {
-            return { user: null, session: null, error };
-        }
-    },
-
-    /**
-     * Sign out current user
      * @returns {Promise<{error}>}
      */
     async signOut() {
@@ -199,15 +170,28 @@ export const authService = {
      */
     async getUserProfile(userId) {
         try {
-            const { data, error } = await supabase
-                .from('user_profiles')
-                .select('*')
-                .eq('id', userId)
-                .single();
+            console.log('🕵️ authService: getUserProfile started');
+
+            // Create a timeout promise
+            const timeoutPromise = new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Profile Load Timeout')), 5000)
+            );
+
+            const { data, error } = await Promise.race([
+                supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .eq('id', userId)
+                    .single(),
+                timeoutPromise
+            ]);
+
+            console.log('🕵️ authService: getUserProfile result', { hasProfile: !!data, error });
 
             if (error) throw error;
             return { profile: data, error: null };
         } catch (error) {
+            console.error('🕵️ authService: getUserProfile error', error);
             return { profile: null, error };
         }
     },
