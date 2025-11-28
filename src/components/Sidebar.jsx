@@ -75,7 +75,7 @@ const Sidebar = ({ isOpen, toggle }) => {
     };
 
     const handleHistoryClick = (query) => {
-        navigate('/result', { state: { query } });
+        navigate(`/result?q=${encodeURIComponent(query)}`, { state: { query } });
     };
 
     return (

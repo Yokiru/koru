@@ -47,14 +47,14 @@ const Home = ({ isSidebarOpen }) => {
         e.preventDefault();
         if (query.trim()) {
             if (checkTrialLimit()) {
-                navigate('/result', { state: { query, quizMode } });
+                navigate(`/result?q=${encodeURIComponent(query)}&quiz=${quizMode}`, { state: { query, quizMode } });
             }
         }
     };
 
     const handleSuggestionClick = (suggestion) => {
         if (checkTrialLimit()) {
-            navigate('/result', { state: { query: suggestion, quizMode } });
+            navigate(`/result?q=${encodeURIComponent(suggestion)}&quiz=${quizMode}`, { state: { query: suggestion, quizMode } });
         }
     };
 

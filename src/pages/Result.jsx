@@ -14,8 +14,11 @@ const Result = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user } = useAuth();
-    const query = location.state?.query || "Learning";
-    const quizMode = location.state?.quizMode || false;
+
+    // Get query from URL search params (persists on refresh) or fallback to location.state
+    const searchParams = new URLSearchParams(location.search);
+    const query = searchParams.get('q') || location.state?.query || "Learning";
+    const quizMode = searchParams.get('quiz') === 'true' || location.state?.quizMode || false;
 
     const [cards, setCards] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
