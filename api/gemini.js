@@ -8,12 +8,14 @@ export default async function handler(req, res) {
   const { action, payload } = req.body;
   const API_KEY = process.env.GEMINI_API_KEY;
 
+  console.log('🔑 API Key check:', { hasKey: !!API_KEY, keyLength: API_KEY?.length });
+
   if (!API_KEY) {
     return res.status(500).json({ error: 'Server configuration error: Missing API Key' });
   }
 
   const genAI = new GoogleGenerativeAI(API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   try {
     let prompt = "";
@@ -50,12 +52,19 @@ export default async function handler(req, res) {
               
               The user is learning about "${topic}" and is confused about: "${confusion}".
               Provide a specific clarification to help them understand.
-              Return ONLY a JSON object with "title" and "content".
+              
+              If the answer is short, provide 1 card.
+              If the answer is long or complex, break it into 2-3 cards to make it easier to read.
+              
+              Return ONLY a JSON array of objects.
               Example format:
-              { "title": "Clarification", "content": "..." }
+              [
+                { "title": "Clarification Part 1", "content": "..." },
+                { "title": "Clarification Part 2", "content": "..." }
+              ]
               
               CRITICAL: Both "title" and "content" MUST be in the SAME LANGUAGE as the user's confusion "${confusion}".
-              Do not include markdown formatting.
+              Do not include markdown formatting. Just the raw JSON array.
             `;
     } else if (action === 'quiz') {
       const { topic, numQuestions } = payload;

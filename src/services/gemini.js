@@ -56,20 +56,43 @@ export const generateExplanation = async (topic) => {
         const text = await callGeminiAPI('explanation', { topic });
         console.log("Gemini Raw Response:", text);
 
-        // Match JSON object instead of array
-        const jsonMatch = text.match(/\{.*\}/s);
-        const jsonString = jsonMatch ? jsonMatch[0] : text;
+        // Clean up markdown code blocks if present
+        const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        // Match JSON array OR object (prioritize array if it looks like one)
+        let jsonMatch = cleanText.match(/\[.*\]/s);
+        if (!jsonMatch) {
+            jsonMatch = cleanText.match(/\{.*\}/s);
+        }
+        const jsonString = jsonMatch ? jsonMatch[0] : cleanText;
 
         try {
             const data = JSON.parse(jsonString);
-            // Check if it has the expected structure
+
+            // Case 1: Direct Array of Cards (New Multi-card format)
+            if (Array.isArray(data)) {
+                return {
+                    cleanTopic: topic,
+                    cards: data
+                };
+            }
+
+            // Case 2: Legacy Object format { cleanTopic, cards }
             if (data.cleanTopic && Array.isArray(data.cards)) {
                 return data;
             }
-            // Fallback if it returns just an array (legacy support or hallucination)
-            if (Array.isArray(data)) {
-                return { cleanTopic: topic, cards: data };
+
+            // Case 3: Simple Object format { title, content }
+            if (data.title && data.content) {
+                return {
+                    cleanTopic: topic,
+                    cards: [{
+                        title: data.title,
+                        content: data.content
+                    }]
+                };
             }
+
             throw new Error("Invalid response format");
         } catch (e) {
             console.warn("JSON Parse failed, falling back to text", e);
@@ -93,16 +116,26 @@ export const generateClarification = async (topic, confusion) => {
         const text = await callGeminiAPI('clarification', { topic, confusion });
         console.log("Gemini Clarification Response:", text);
 
-        const jsonMatch = text.match(/\{.*\}/s);
-        const jsonString = jsonMatch ? jsonMatch[0] : text;
+        // Clean up markdown code blocks if present
+        const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        // Match JSON array or object
+        const jsonMatch = cleanText.match(/(\[.*\]|\{.*\})/s);
+        const jsonString = jsonMatch ? jsonMatch[0] : cleanText;
 
         try {
-            return JSON.parse(jsonString);
+            const result = JSON.parse(jsonString);
+            if (Array.isArray(result)) {
+                return result;
+            } else if (typeof result === 'object') {
+                return [result];
+            }
+            throw new Error("Invalid format");
         } catch (e) {
-            return {
+            return [{
                 title: "Clarification",
                 content: text.replace(/```json/g, '').replace(/```/g, '')
-            };
+            }];
         }
     } catch (error) {
         console.error("Error generating clarification:", error);
@@ -115,8 +148,11 @@ export const generateQuizQuestions = async (topic, numQuestions = 3) => {
         const text = await callGeminiAPI('quiz', { topic, numQuestions });
         console.log("Gemini Quiz Response:", text);
 
-        const jsonMatch = text.match(/\[.*\]/s);
-        const jsonString = jsonMatch ? jsonMatch[0] : text;
+        // Clean up markdown code blocks if present
+        const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        const jsonMatch = cleanText.match(/\[.*\]/s);
+        const jsonString = jsonMatch ? jsonMatch[0] : cleanText;
 
         try {
             const questions = JSON.parse(jsonString);

@@ -52,7 +52,7 @@ const QuizCard = ({ question, type, options, correctAnswer, explanation, onAnswe
             </div>
 
             <div className="quiz-options">
-                {options.map((option, index) => (
+                {Array.isArray(options) && options.map((option, index) => (
                     <button
                         key={index}
                         onClick={() => handleAnswerSelect(option)}

@@ -246,8 +246,9 @@ const Result = () => {
             // Move to next quiz question
             setCurrentQuizIndex(prev => prev + 1);
         } else if (showQuiz) {
-            // Finished all quiz questions
-            navigate('/');
+            // Finished all quiz questions, show feedback
+            setShowQuiz(false);
+            setShowFeedback(true);
         } else if (currentIndex < cards.length - 1) {
             setCurrentIndex(prev => prev + 1);
         } else if (quizMode && quizQuestions.length > 0 && !showQuiz) {
@@ -268,6 +269,10 @@ const Result = () => {
             setCurrentIndex(cards.length - 1);
         } else if (showFeedback) {
             setShowFeedback(false);
+            if (quizMode && quizQuestions.length > 0) {
+                setShowQuiz(true);
+                setCurrentQuizIndex(quizQuestions.length - 1);
+            }
         } else if (currentIndex > 0) {
             setCurrentIndex(prev => prev - 1);
         } else {
@@ -291,10 +296,10 @@ const Result = () => {
             setGenerating(true);
             try {
                 // Generate clarification based on the specific confusion
-                const clarification = await generateClarification(query, text);
+                const clarificationCards = await generateClarification(query, text);
 
-                // Add clarification card after current cards
-                setCards(prev => [...prev, clarification]);
+                // Add clarification cards after current cards
+                setCards(prev => [...prev, ...clarificationCards]);
 
                 // Move to the new card
                 setShowFeedback(false);
