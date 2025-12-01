@@ -150,12 +150,12 @@
     height: 8px;
     border-radius: 50%;
     background-color: rgba(209, 207, 192, 0.3);
-    transition: background-color 0.3s;
+    transition: all 0.3s;
 }
 
 .indicator.active {
     background-color: var(--accent);
-    transform: scale(1.2);
+    transform: scale(1.5);
 }
 
 .feedback-indicator {
@@ -203,40 +203,31 @@
     .progress-indicators {
         gap: 0.4rem;
         max-width: 150px;
-        /* Limit width on mobile */
         overflow-x: auto;
-        /* Enable horizontal scroll */
         padding: 0.5rem;
-        /* Add padding for scrollbar/touch */
         justify-content: flex-start;
-        /* Align to start for scrolling */
 
-        /* Hide scrollbar for Chrome, Safari and Opera */
-        &::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Hide scrollbar for IE, Edge and Firefox */
+        /* Hide scrollbar */
         -ms-overflow-style: none;
-        /* IE and Edge */
         scrollbar-width: none;
-        /* Firefox */
 
         /* Fade mask effect */
         mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
         -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
     }
 
+    .progress-indicators::-webkit-scrollbar {
+        display: none;
+    }
+
     .indicator {
         width: 8px;
         height: 8px;
         min-width: 8px;
-        /* Prevent shrinking */
         cursor: pointer;
-        /* Show pointer on mobile too */
     }
 
     .indicator.active {
-        width: 24px;
+        transform: scale(1.5);
     }
 }
