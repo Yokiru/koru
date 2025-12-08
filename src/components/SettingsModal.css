@@ -638,18 +638,19 @@
         display: none;
     }
 
-    /* Fade effect on right edge */
+    /* Fade effect on right edge - using fixed position to stay stuck while scrolling */
     .settings-sidebar::after {
         content: '';
-        position: absolute;
-        top: 0;
+        position: fixed;
+        top: calc(env(safe-area-inset-top, 0px) + 52px);
         right: 0;
-        bottom: 0;
-        width: 40px;
+        height: 45px;
+        width: 50px;
         background: linear-gradient(to right,
                 transparent 0%,
                 #1F1F1F 100%);
         pointer-events: none;
+        z-index: 5;
     }
 
     [data-theme="light"] .settings-sidebar::after {
