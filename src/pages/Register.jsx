@@ -154,7 +154,7 @@ const Register = () => {
             case 1:
                 return "We'll use this to keep your account safe";
             case 2:
-                return "This is how you'll appear in Nue";
+                return "This is how you'll appear in Koru";
             case 3:
                 return "Make it strong to protect your learning journey";
             default:

@@ -154,7 +154,7 @@ const SettingsPage = () => {
                         <div className="settings-option">
                             <div className="option-header">
                                 <span className="option-title">App Version</span>
-                                <span className="option-description">Current version of Nue Learning</span>
+                                <span className="option-description">Current version of Koru Learning</span>
                             </div>
                             <span className="option-value">v1.0.0</span>
                         </div>

@@ -46,7 +46,7 @@ const translations = {
         'auth.signup': 'Sign Up',
         'auth.email': 'Email',
         'auth.password': 'Password',
-        'auth.welcome': 'Welcome to Nue',
+        'auth.welcome': 'Welcome to Koru',
         'auth.subtitle': 'Sign in to continue your learning journey',
         'auth.placeholder_email': 'Enter your email',
         'auth.placeholder_password': 'Enter your password',
@@ -56,7 +56,7 @@ const translations = {
         'auth.signup_link': 'Sign up',
 
         // Home
-        'home.welcome': 'Welcome to Nue',
+        'home.welcome': 'Welcome to Koru',
         'home.subtitle': 'What do you want to learn today?',
         'home.placeholder': 'Ask anything...',
         'home.search': 'Search',
@@ -216,7 +216,7 @@ const translations = {
         'auth.signup': 'Daftar',
         'auth.email': 'Email',
         'auth.password': 'Kata Sandi',
-        'auth.welcome': 'Selamat Datang di Nue',
+        'auth.welcome': 'Selamat Datang di Koru',
         'auth.subtitle': 'Masuk untuk melanjutkan perjalanan belajarmu',
         'auth.placeholder_email': 'Masukkan email kamu',
         'auth.placeholder_password': 'Masukkan kata sandi',
@@ -226,7 +226,7 @@ const translations = {
         'auth.signup_link': 'Daftar',
 
         // Home
-        'home.welcome': 'Selamat Datang di Nue',
+        'home.welcome': 'Selamat Datang di Koru',
         'home.subtitle': 'Apa yang ingin kamu pelajari hari ini?',
         'home.placeholder': 'Tanyakan apa saja...',
         'home.search': 'Cari',

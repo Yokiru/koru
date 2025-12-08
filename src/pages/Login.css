@@ -52,9 +52,9 @@
 }
 
 .auth-logo-large {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Lora', serif;
     font-size: 3.5rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-primary);
     margin-bottom: 0.75rem;
     line-height: 1.2;

@@ -52,7 +52,7 @@ const Login = () => {
                 <Home size={20} />
             </Link>
             <div className="auth-header-outside">
-                <h1 className="auth-logo-large">Welcome to Nue</h1>
+                <h1 className="auth-logo-large">Welcome to Koru</h1>
                 <p className="auth-subtitle-large">Sign in to continue your learning journey</p>
             </div>
 

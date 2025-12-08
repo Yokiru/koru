@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
 
             // Load cached profile immediately for instant display
-            const cached = localStorage.getItem('nue_user_profile');
+            const cached = localStorage.getItem('koru_user_profile');
             if (cached) {
                 try {
                     setProfile(JSON.parse(cached));
@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
                 loadUserProfile(user.id);
             } else {
                 // Clear cache if no user
-                localStorage.removeItem('nue_user_profile');
+                localStorage.removeItem('koru_user_profile');
                 setProfile(null);
             }
         } catch (error) {
@@ -88,11 +88,11 @@ export const AuthProvider = ({ children }) => {
             if (profile) {
                 setProfile(profile);
                 // Cache profile to localStorage
-                localStorage.setItem('nue_user_profile', JSON.stringify(profile));
+                localStorage.setItem('koru_user_profile', JSON.stringify(profile));
             } else if (error) {
                 console.error('Error loading profile:', error);
                 // Try to use cached profile if available
-                const cached = localStorage.getItem('nue_user_profile');
+                const cached = localStorage.getItem('koru_user_profile');
                 if (cached) {
                     try {
                         setProfile(JSON.parse(cached));
@@ -104,7 +104,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Exception loading profile:', error);
             // Try to use cached profile
-            const cached = localStorage.getItem('nue_user_profile');
+            const cached = localStorage.getItem('koru_user_profile');
             if (cached) {
                 try {
                     setProfile(JSON.parse(cached));
@@ -178,7 +178,7 @@ export const AuthProvider = ({ children }) => {
         setSession(null);
 
         // Clear cached profile
-        localStorage.removeItem('nue_user_profile');
+        localStorage.removeItem('koru_user_profile');
 
         try {
             // Set a timeout to force logout if Supabase takes too long
@@ -214,7 +214,7 @@ export const AuthProvider = ({ children }) => {
                 ...updates
             };
             setProfile(updatedProfile);
-            localStorage.setItem('nue_user_profile', JSON.stringify(updatedProfile));
+            localStorage.setItem('koru_user_profile', JSON.stringify(updatedProfile));
 
             const { error } = await authService.updateUserProfile(user.id, updates);
 
@@ -283,7 +283,7 @@ export const AuthProvider = ({ children }) => {
                 avatar_url: url
             };
             setProfile(updatedProfile);
-            localStorage.setItem('nue_user_profile', JSON.stringify(updatedProfile));
+            localStorage.setItem('koru_user_profile', JSON.stringify(updatedProfile));
 
             return { success: true, url, error: null };
         } catch (error) {
