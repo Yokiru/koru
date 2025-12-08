@@ -4,8 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getInitials, generateAvatarColor, getAvatarUrl } from '../utils/avatarUtils';
 import { Settings, LogOut, HelpCircle, Globe, Check, MoreHorizontal, Crown } from 'lucide-react';
-import { SettingsContext } from '../App';
-import PlanModal from './PlanModal';
+import { SettingsContext, PlanContext } from '../App';
 import './ProfileSection.css';
 
 const ProfileSection = () => {
@@ -13,9 +12,9 @@ const ProfileSection = () => {
     const { user, profile, isAuthenticated, logout } = useAuth();
     const { language, changeLanguage, t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
-    const [isPlanOpen, setIsPlanOpen] = useState(false);
     const menuRef = useRef(null);
     const { openSettings } = useContext(SettingsContext);
+    const { openPlan } = useContext(PlanContext);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -105,7 +104,7 @@ const ProfileSection = () => {
                                 className="menu-item"
                                 onClick={() => {
                                     setIsOpen(false);
-                                    setIsPlanOpen(true);
+                                    openPlan();
                                 }}
                             >
                                 <Crown size={16} />
@@ -154,12 +153,6 @@ const ProfileSection = () => {
                     <MoreHorizontal size={20} className="profile-more-icon" />
                 </div>
             </div>
-
-            <PlanModal
-                isOpen={isPlanOpen}
-                onClose={() => setIsPlanOpen(false)}
-                currentPlan={profile?.subscription_plan?.toLowerCase() || 'free'}
-            />
         </>
     );
 };
