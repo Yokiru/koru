@@ -98,12 +98,15 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: rgba(31, 31, 31, 0.95);
-    backdrop-filter: blur(10px);
+    background-color: rgba(31, 31, 31, 0.98);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    transition: border-color 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: border-color 0.2s ease;
+    /* GPU acceleration */
+    transform: translateZ(0);
 }
 
 [data-theme="light"] .input-container {

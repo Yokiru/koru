@@ -302,25 +302,57 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+    .plan-modal-overlay {
+        padding: 0;
+        align-items: stretch;
+    }
+
     .plan-modal {
-        border-radius: 16px;
+        border-radius: 0;
+        max-height: 100vh;
+        height: 100vh;
+        max-width: 100%;
+        border: none;
+    }
+
+    .plan-modal-close {
+        top: 1rem;
+        right: 1rem;
     }
 
     .plan-modal-header {
-        padding: 2rem 1.5rem 1rem;
+        padding: 1.5rem 1rem 1rem;
     }
 
     .plan-modal-title {
         font-size: 1.5rem;
     }
 
+    .plan-modal-subtitle {
+        font-size: 0.9rem;
+    }
+
     .plan-cards {
-        padding: 1rem 1.5rem 2rem;
+        padding: 1rem;
         gap: 1rem;
+        max-width: 100%;
     }
 
     .plan-card {
         padding: 1.25rem;
+    }
+
+    .plan-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .plan-name {
+        font-size: 1.1rem;
+    }
+
+    .price-amount {
+        font-size: 1.3rem;
     }
 }

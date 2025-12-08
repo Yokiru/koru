@@ -589,18 +589,22 @@
     .settings-modal-chatgpt {
         flex-direction: column;
         max-height: 100vh;
+        max-height: 100dvh;
         height: 100vh;
+        height: 100dvh;
         max-width: 100%;
         border-radius: 0;
+        padding-top: env(safe-area-inset-top, 0);
     }
 
     /* Mobile Header with Title */
     .settings-modal-chatgpt::before {
         content: 'Settings';
         display: block;
-        padding: 20px 20px 16px 20px;
+        padding: 16px 20px 12px 20px;
+        padding-top: max(16px, env(safe-area-inset-top, 16px));
         font-family: 'Bricolage Grotesque', sans-serif;
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         font-weight: 600;
         color: #fff;
         background: #1F1F1F;
@@ -624,6 +628,34 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         overflow-x: auto;
         flex-shrink: 0;
+        position: relative;
+        /* Hide scrollbar */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .settings-sidebar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Fade effect on right edge */
+    .settings-sidebar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 40px;
+        background: linear-gradient(to right,
+                transparent 0%,
+                #1F1F1F 100%);
+        pointer-events: none;
+    }
+
+    [data-theme="light"] .settings-sidebar::after {
+        background: linear-gradient(to right,
+                transparent 0%,
+                #ffffff 100%);
     }
 
     [data-theme="light"] .settings-sidebar {
@@ -635,6 +667,7 @@
         gap: 0;
         flex-wrap: nowrap;
         width: max-content;
+        padding-right: 30px;
     }
 
     .nav-item {

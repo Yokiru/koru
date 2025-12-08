@@ -40,6 +40,12 @@
     box-shadow: none;
     border-right: 1px solid rgba(255, 255, 255, 0.05);
     padding-top: 0;
+    /* GPU acceleration for smooth mobile animations */
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 /* Light mode sidebar */
@@ -263,6 +269,10 @@
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 90;
+    /* GPU acceleration */
+    will-change: opacity;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
 
 @media (min-width: 1024px) {
