@@ -203,6 +203,15 @@
     background: rgba(0, 0, 0, 0.05);
 }
 
+.plan-badge-small {
+    font-size: 11px;
+    background: rgba(247, 111, 83, 0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--accent);
+    font-weight: 500;
+}
+
 .menu-item svg {
     color: var(--text-secondary);
     flex-shrink: 0;

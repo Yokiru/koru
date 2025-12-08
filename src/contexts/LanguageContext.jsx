@@ -62,11 +62,11 @@ const translations = {
         'home.search': 'Search',
         'home.quiz_mode': 'Quiz Mode',
         'home.greetings': [
-            "Hi, ready to learn something new?",
-            "Hello, what's on your mind today?",
-            "Greetings, let's make it simple.",
-            "Hey there, curious mind!",
-            "Welcome, what shall we explore?"
+            "Hey {name}, what's on your mind?",
+            "Hi {name}, ready to learn?",
+            "{name}, let's explore today!",
+            "Welcome back, {name}!",
+            "Hey {name}, curious about something?"
         ],
         'home.suggestions': [
             "Explain Quantum Physics",
@@ -232,9 +232,11 @@ const translations = {
         'home.search': 'Cari',
         'home.quiz_mode': 'Mode Kuis',
         'home.greetings': [
-            "Hai, siap belajar hal baru?",
-            "Halo, apa yang ingin kamu pelajari?",
-            "Selamat datang, apa yang akan kita jelajahi?"
+            "Hei {name}, mau belajar apa?",
+            "Hai {name}, siap eksplorasi?",
+            "{name}, ayo mulai belajar!",
+            "Selamat datang, {name}!",
+            "Hei {name}, penasaran sesuatu?"
         ],
         'home.suggestions': [
             "Jelaskan Fisika Kuantum",

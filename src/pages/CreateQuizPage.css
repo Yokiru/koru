@@ -1,0 +1,492 @@
+.create-quiz-page {
+    padding: 2rem;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.create-quiz-container {
+    background: #1F1F1F;
+    border: none;
+    border-radius: 16px;
+    padding: 2.5rem;
+    width: 100%;
+    position: relative;
+    box-shadow: none;
+    animation: slideUp 0.3s ease-out;
+}
+
+[data-theme="light"] .create-quiz-container {
+    background: #ffffff;
+    border: none;
+    box-shadow: none;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+}
+
+.instruction-block {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+[data-theme="light"] .instruction-block {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.instruction-icon {
+    color: var(--accent);
+    margin-top: 0.125rem;
+}
+
+.instruction-block p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.quiz-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    transition: all 0.2s;
+    font-family: inherit;
+    box-sizing: border-box;
+    height: 3rem;
+    line-height: 3rem;
+}
+
+.form-select {
+    border: 1px solid var(--accent);
+}
+
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-select {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .form-select {
+    border: 1px solid var(--accent);
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .form-input:focus,
+[data-theme="light"] .form-select:focus {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.form-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.5;
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.form-select {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25em 1.25em;
+    padding-right: 2.5rem;
+}
+
+[data-theme="light"] .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+.form-select option {
+    background: #2a2a2a;
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+}
+
+.form-select option:hover,
+.form-select option:checked {
+    background: var(--accent);
+    color: white;
+}
+
+[data-theme="light"] .form-select option {
+    background: #ffffff;
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .form-select option:hover,
+[data-theme="light"] .form-select option:checked {
+    background: var(--accent);
+    color: white;
+}
+
+.input-hint {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+[data-theme="light"] .btn-cancel {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .btn-cancel:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.btn-create {
+    background: #D1CFC0;
+    border: none;
+    color: #1F1F1F;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(209, 207, 192, 0.3);
+}
+
+.btn-create:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(209, 207, 192, 0.4);
+}
+
+.btn-create:active {
+    transform: translateY(0);
+}
+
+/* Number Input Styles */
+.number-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.number-input {
+    padding-right: 3rem;
+    -moz-appearance: textfield;
+    appearance: none;
+}
+
+/* Hide default spinners */
+.number-input::-webkit-outer-spin-button,
+.number-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.spinner-controls {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    bottom: 4px;
+    width: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.spinner-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+[data-theme="light"] .spinner-btn {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.spinner-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--accent);
+}
+
+[data-theme="light"] .spinner-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.spinner-btn:active {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(0.95);
+}
+
+[data-theme="light"] .spinner-btn:active {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 640px) {
+    .create-quiz-page {
+        padding: 1rem;
+        justify-content: flex-start;
+        padding-top: 6rem;
+    }
+
+    .create-quiz-container {
+        padding: 0;
+        background: transparent;
+        animation: none;
+    }
+
+    .page-header {
+        text-align: left;
+        margin-bottom: 2rem;
+        padding-left: 0.25rem;
+    }
+
+    .page-header h1 {
+        font-size: 2.25rem;
+        font-family: var(--font-headline);
+        font-weight: 600;
+        line-height: 1.1;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
+    }
+
+    .instruction-block {
+        background: #252525;
+        border: none;
+        padding: 1.5rem;
+        margin-bottom: 2.5rem;
+        border-radius: 12px;
+    }
+
+    .instruction-block p {
+        color: #9CA3AF;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .instruction-icon {
+        display: none;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .form-group label {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        color: var(--text-primary);
+    }
+
+    .form-input,
+    .form-select {
+        background: #252525;
+        border: 1px solid #333;
+        padding: 1rem;
+        height: 3rem;
+        font-size: 1rem;
+        border-radius: 8px;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+        border-color: var(--text-primary);
+        background: #252525;
+    }
+
+    .form-actions {
+        margin-top: 3rem;
+        gap: 1rem;
+    }
+
+    .btn-cancel {
+        border: 1px solid #333;
+        padding: 0.875rem 1.5rem;
+    }
+
+    .btn-create {
+        background: var(--text-primary);
+        color: var(--bg-primary);
+        font-weight: 600;
+        padding: 0.875rem 1.5rem;
+        box-shadow: none;
+    }
+}
+/* Loading and Error States */
+.btn-create:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-create:disabled:hover {
+    transform: none;
+    box-shadow: 0 4px 12px rgba(209, 207, 192, 0.3);
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.btn-create {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.error-message {
+    background: rgba(255, 59, 48, 0.1);
+    border: 1px solid #ff3b30;
+    border-radius: 8px;
+    padding: 0.875rem 1rem;
+    color: #ff3b30;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+/* Custom Instructions Textarea */
+.form-textarea {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.5;
+    transition: all 0.2s;
+}
+
+.form-textarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(247, 111, 83, 0.05);
+}
+
+[data-theme="light"] .form-textarea {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .form-textarea:focus {
+    background: rgba(247, 111, 83, 0.03);
+}
+
+.optional-badge {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+}

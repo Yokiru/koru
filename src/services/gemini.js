@@ -143,9 +143,15 @@ export const generateClarification = async (topic, confusion) => {
     }
 };
 
-export const generateQuizQuestions = async (topic, numQuestions = 3) => {
+export const generateQuizQuestions = async ({ topic, quizType = 'multiple-choice', difficulty = 'intermediate', numQuestions = 5, customInstructions = '' }) => {
     try {
-        const text = await callGeminiAPI('quiz', { topic, numQuestions });
+        const text = await callGeminiAPI('quiz', {
+            topic,
+            quizType,
+            difficulty,
+            numQuestions,
+            customInstructions
+        });
         console.log("Gemini Quiz Response:", text);
 
         // Clean up markdown code blocks if present
@@ -157,18 +163,64 @@ export const generateQuizQuestions = async (topic, numQuestions = 3) => {
         try {
             const questions = JSON.parse(jsonString);
             if (Array.isArray(questions) && questions.length > 0) {
-                return questions;
+                // Shuffle function to randomize array
+                const shuffleArray = (array) => {
+                    const shuffled = [...array];
+                    for (let i = shuffled.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                    }
+                    return shuffled;
+                };
+
+                // Process each question to ensure id and shuffle options
+                return questions.map((q, index) => {
+                    // Only shuffle if it's multiple choice (has 4 options)
+                    if (q.options && q.options.length === 4 && q.correctAnswer) {
+                        const shuffledOptions = shuffleArray(q.options);
+                        return {
+                            ...q,
+                            id: q.id || index + 1,
+                            options: shuffledOptions
+                            // correctAnswer stays the same - it's the value, not the position
+                        };
+                    }
+                    return {
+                        ...q,
+                        id: q.id || index + 1
+                    };
+                });
             }
             throw new Error("Invalid quiz format");
         } catch (e) {
             console.warn("Quiz JSON parse failed", e);
-            return [{
-                question: `What is the main concept of ${topic}?`,
-                type: "true_false",
-                options: ["True", "False"],
-                correctAnswer: "True",
-                explanation: "This is a basic understanding check."
-            }];
+            // Return fallback based on quiz type
+            if (quizType === 'true-false') {
+                return [{
+                    id: 1,
+                    question: `Statement about ${topic}`,
+                    options: ["True", "False"],
+                    correctAnswer: "True",
+                    explanation: "This is a fallback question due to parsing error."
+                }];
+            } else if (quizType === 'essay') {
+                return [{
+                    id: 1,
+                    question: `Explain the key concepts of ${topic}.`,
+                    options: [],
+                    correctAnswer: null,
+                    sampleAnswer: "Please provide a detailed explanation.",
+                    explanation: "This is a fallback question due to parsing error."
+                }];
+            } else {
+                return [{
+                    id: 1,
+                    question: `What is the main concept of ${topic}?`,
+                    options: ["Option A", "Option B", "Option C", "Option D"],
+                    correctAnswer: "Option A",
+                    explanation: "This is a fallback question due to parsing error."
+                }];
+            }
         }
     } catch (error) {
         console.error("Error generating quiz questions:", error);

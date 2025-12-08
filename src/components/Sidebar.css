@@ -280,3 +280,120 @@
         position: absolute;
     }
 }
+
+/* ========== Pin Feature Styles ========== */
+
+/* Pinned item indicator */
+.history-item.pinned {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.history-item.pinned .history-icon {
+    color: var(--accent);
+    opacity: 1;
+}
+
+[data-theme="light"] .history-item.pinned {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* History actions container */
+.history-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* More button (3-dot) */
+.more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.history-item:hover .more-btn {
+    opacity: 0.6;
+}
+
+.more-btn:hover {
+    opacity: 1 !important;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .more-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Dropdown menu */
+.history-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #2d2d2d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 4px;
+    min-width: 160px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .history-dropdown {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .dropdown-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-item.danger {
+    color: #ff6b6b;
+}
+
+.dropdown-item.danger:hover {
+    background: rgba(255, 100, 100, 0.1);
+}
+
+/* Mobile: show more button only when item is active/pressed */
+@media (max-width: 768px) {
+    .more-btn {
+        opacity: 0;
+    }
+
+    .history-item:active .more-btn,
+    .history-item.menu-open .more-btn {
+        opacity: 0.6;
+    }
+}

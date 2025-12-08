@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getInitials, generateAvatarColor, getAvatarUrl } from '../utils/avatarUtils';
-import { Settings, LogOut, HelpCircle, Globe, Check, MoreHorizontal } from 'lucide-react';
+import { Settings, LogOut, HelpCircle, Globe, Check, MoreHorizontal, Crown } from 'lucide-react';
+import { SettingsContext } from '../App';
+import PlanModal from './PlanModal';
 import './ProfileSection.css';
 
 const ProfileSection = () => {
@@ -11,7 +13,9 @@ const ProfileSection = () => {
     const { user, profile, isAuthenticated, logout } = useAuth();
     const { language, changeLanguage, t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
+    const [isPlanOpen, setIsPlanOpen] = useState(false);
     const menuRef = useRef(null);
+    const { openSettings } = useContext(SettingsContext);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -91,11 +95,24 @@ const ProfileSection = () => {
                                 className="menu-item"
                                 onClick={() => {
                                     setIsOpen(false);
-                                    navigate('/settings');
+                                    openSettings();
                                 }}
                             >
                                 <Settings size={16} />
                                 <span>{t('menu.settings')}</span>
+                            </button>
+                            <button
+                                className="menu-item"
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    setIsPlanOpen(true);
+                                }}
+                            >
+                                <Crown size={16} />
+                                <div className="menu-item-content">
+                                    <span>Plan</span>
+                                    <span className="plan-badge-small">{profile?.subscription_plan || 'Free'}</span>
+                                </div>
                             </button>
                             <button className="menu-item" onClick={handleLanguageToggle}>
                                 <Globe size={16} />
@@ -137,6 +154,12 @@ const ProfileSection = () => {
                     <MoreHorizontal size={20} className="profile-more-icon" />
                 </div>
             </div>
+
+            <PlanModal
+                isOpen={isPlanOpen}
+                onClose={() => setIsPlanOpen(false)}
+                currentPlan={profile?.subscription_plan?.toLowerCase() || 'free'}
+            />
         </>
     );
 };

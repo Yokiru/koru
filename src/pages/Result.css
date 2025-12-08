@@ -1,12 +1,18 @@
 .result-container {
     display: flex;
     flex-direction: column;
+    align-items: center;
     min-height: 100vh;
     padding: 2rem;
+    width: 100%;
+    max-width: 100vw;
+    /* Ensure it doesn't overflow viewport */
+    margin: 0 auto;
+    box-sizing: border-box;
+    position: relative;
 }
 
 .result-container.loading {
-    align-items: center;
     justify-content: center;
 }
 
@@ -68,6 +74,8 @@
     align-items: center;
     margin-bottom: 2rem;
     padding-top: 1rem;
+    width: 100%;
+    max-width: 700px;
 }
 
 .topic-title-container {
@@ -76,15 +84,9 @@
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-
-    /* Hide scrollbar but keep functionality */
     -ms-overflow-style: none;
     scrollbar-width: none;
-
-    /* Smooth scrolling */
     scroll-behavior: smooth;
-
-    /* Fade effect on edges */
     mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
     -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 }
@@ -133,6 +135,8 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    width: 100%;
+    max-width: 800px;
 }
 
 .result-footer {
@@ -141,6 +145,8 @@
     justify-content: space-between;
     margin-top: 2rem;
     padding: 0 1rem;
+    width: 100%;
+    max-width: 700px;
 }
 
 .nav-button {
@@ -233,12 +239,8 @@
         overflow-x: auto;
         padding: 0.5rem;
         justify-content: flex-start;
-
-        /* Hide scrollbar */
         -ms-overflow-style: none;
         scrollbar-width: none;
-
-        /* Fade mask effect */
         mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
         -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
     }
@@ -257,4 +259,27 @@
     .indicator.active {
         transform: scale(1.5);
     }
+}
+.nav-button.back-btn {
+    background-color: #363636;
+    color: #D1CFC0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-button.back-btn:hover:not(.disabled) {
+    background-color: #4a4a4a;
+    color: #ffffff;
+}
+
+.nav-button.next-btn {
+    background-color: #D1CFC0;
+    color: #1F1F1F;
+    font-weight: 600;
+}
+
+.nav-button.next-btn:hover:not(.disabled) {
+    background-color: #ffffff;
+    color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(209, 207, 192, 0.2);
 }

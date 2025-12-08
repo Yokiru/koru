@@ -1,52 +1,99 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import Home from './pages/Home';
-import Result from './pages/Result';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import SettingsPage from './pages/SettingsPage';
+
+// Lazy load all pages for better performance
+const Home = React.lazy(() => import('./pages/Home'));
+const Result = React.lazy(() => import('./pages/Result'));
+const Login = React.lazy(() => import('./pages/Login'));
+const Register = React.lazy(() => import('./pages/Register'));
+const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = React.lazy(() => import('./pages/ResetPassword'));
+const QuizzesPage = React.lazy(() => import('./pages/QuizzesPage'));
+const CreateQuizPage = React.lazy(() => import('./pages/CreateQuizPage'));
+const QuizTakePage = React.lazy(() => import('./pages/QuizTakePage'));
+const QuizResultPage = React.lazy(() => import('./pages/QuizResultPage'));
+const QuizFullPage = React.lazy(() => import('./pages/QuizFullPage'));
+const NotFound = React.lazy(() => import('./pages/NotFound'));
+
 import Sidebar from './components/Sidebar';
+import SettingsModal from './components/SettingsModal';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 import './App.css';
 
+// Create context for settings modal
+export const SettingsContext = React.createContext();
+
+// Simple loading fallback
+const PageLoader = () => (
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+    background: 'var(--bg-primary)'
+  }}>
+    <div style={{
+      color: 'var(--text-secondary)',
+      fontSize: '1rem'
+    }}>
+      Loading...
+    </div>
+  </div>
+);
+
 function AppContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const openSettings = () => setIsSettingsOpen(true);
+  const closeSettings = () => setIsSettingsOpen(false);
 
-  // Hide sidebar on auth pages and settings page
-  const hideSidebar = ['/login', '/register', '/forgot-password', '/reset-password', '/settings'].includes(location.pathname);
+  // Hide sidebar on auth pages
+  const hideSidebar = ['/login', '/register', '/forgot-password', '/reset-password'].includes(location.pathname);
 
   return (
-    <div className="app-container">
-      {location.pathname === '/' && (
-        <button
-          onClick={toggleTheme}
-          className="theme-toggle-btn"
-          aria-label="Toggle theme"
-        >
-          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
-      )}
-      {!hideSidebar && <Sidebar isOpen={isSidebarOpen} toggle={toggleSidebar} />}
-      <main className={`main-content ${isSidebarOpen && !hideSidebar ? 'sidebar-open' : ''}`}>
-        <Routes>
-          <Route path="/" element={<Home isSidebarOpen={isSidebarOpen} />} />
-          <Route path="/result" element={<Result />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-        </Routes>
-      </main>
-    </div>
+    <SettingsContext.Provider value={{ openSettings, closeSettings, isSettingsOpen }}>
+      <div className="app-container">
+        {/* Theme toggle disabled for now
+        {location.pathname === '/' && (
+          <button
+            onClick={toggleTheme}
+            className="theme-toggle-btn"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+        )}
+        */}
+        {!hideSidebar && <Sidebar isOpen={isSidebarOpen} toggle={toggleSidebar} />}
+        <main className={`main-content ${isSidebarOpen && !hideSidebar ? 'sidebar-open' : ''}`}>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Home isSidebarOpen={isSidebarOpen} />} />
+              <Route path="/result" element={<Result />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/quizzes" element={<ProtectedRoute><QuizzesPage /></ProtectedRoute>} />
+              <Route path="/create-quiz" element={<ProtectedRoute><CreateQuizPage /></ProtectedRoute>} />
+              <Route path="/quiz/:quizId" element={<ProtectedRoute><QuizTakePage /></ProtectedRoute>} />
+              <Route path="/quiz-full/:quizId" element={<ProtectedRoute><QuizFullPage /></ProtectedRoute>} />
+              <Route path="/quiz/:quizId/results" element={<ProtectedRoute><QuizResultPage /></ProtectedRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </main>
+
+        {/* Settings Modal - renders on top of everything */}
+        <SettingsModal isOpen={isSettingsOpen} onClose={closeSettings} />
+      </div>
+    </SettingsContext.Provider>
   );
 }
 

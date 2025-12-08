@@ -61,32 +61,114 @@ export default async function handler(req, res) {
               DO NOT use markdown formatting like \`\`\`json. Just return the raw JSON object.
             `;
     } else if (action === 'quiz') {
+      const quizType = payload.quizType || 'multiple-choice';
+      const difficulty = payload.difficulty || 'intermediate';
+      const numQuestions = payload.numQuestions || 5;
+      const topic = payload.topic;
+      const customInstructions = payload.customInstructions || '';
+
+      // Difficulty instruction
+      const difficultyInstructions = {
+        'beginner': 'Questions should be basic and straightforward, testing fundamental concepts.',
+        'intermediate': 'Questions should be moderately challenging, requiring good understanding of the topic.',
+        'advanced': 'Questions should be complex and challenging, testing deep knowledge and critical thinking.'
+      };
+
+      // Quiz type specific instructions
+      let typeInstructions = '';
+      let formatExample = '';
+
+      if (quizType === 'multiple-choice') {
+        typeInstructions = `
+          Generate MULTIPLE CHOICE questions.
+          Each question must have exactly 4 options labeled with actual answers (NOT A, B, C, D placeholders).
+          Only ONE option should be correct.
+          
+          IMPORTANT: Do NOT use "True" and "False" as options. This is NOT a True/False quiz.
+          Each option should be a unique, meaningful answer choice.
+          Options should be diverse and not just variations of true/false.
+        `;
+        formatExample = `
+          [
+            {
+              "id": 1,
+              "question": "What is the capital of France?",
+              "options": ["Paris", "London", "Berlin", "Madrid"],
+              "correctAnswer": "Paris",
+              "explanation": "Paris is the capital city of France."
+            }
+          ]
+        `;
+      } else if (quizType === 'true-false') {
+        typeInstructions = `
+          Generate TRUE/FALSE questions.
+          Each question should be a STATEMENT that is either true or false.
+          Options must be exactly ["True", "False"].
+        `;
+        formatExample = `
+          [
+            {
+              "id": 1,
+              "question": "The Earth is the third planet from the Sun.",
+              "options": ["True", "False"],
+              "correctAnswer": "True",
+              "explanation": "Earth is indeed the third planet from the Sun."
+            }
+          ]
+        `;
+      } else if (quizType === 'essay') {
+        typeInstructions = `
+          Generate ESSAY/SHORT ANSWER questions.
+          These are open-ended questions requiring written responses.
+          No options needed - the options array should be empty [].
+          Provide a sampleAnswer instead of correctAnswer.
+        `;
+        formatExample = `
+          [
+            {
+              "id": 1,
+              "question": "Explain the key concepts of...?",
+              "options": [],
+              "correctAnswer": null,
+              "sampleAnswer": "A well-structured sample answer explaining the topic...",
+              "explanation": "This question tests understanding of..."
+            }
+          ]
+        `;
+      }
+
       prompt = `
-              Generate ${payload.numQuestions || 3} quiz questions about "${payload.topic}".
-              
-              Return ONLY a JSON array of objects.
-              Each object must have:
-              - question: string
-              - type: "multiple_choice" or "true_false"
-              - options: array of strings (4 for multiple_choice, 2 for true_false)
-              - correctAnswer: string (must be one of the options)
-              - explanation: string (short explanation of why it's correct)
-              
-              IMPORTANT: Write the questions in the SAME language as the Topic.
-              
-              Example format:
-              [
-                {
-                  "question": "...",
-                  "type": "multiple_choice",
-                  "options": ["A", "B", "C", "D"],
-                  "correctAnswer": "A",
-                  "explanation": "..."
-                }
-              ]
-              
-              DO NOT use markdown formatting like \`\`\`json. Just return the raw JSON array.
-            `;
+        You are an expert quiz generator.
+        
+        Generate exactly ${numQuestions} quiz questions about "${topic}".
+        
+        QUIZ TYPE: ${quizType.toUpperCase()}
+        DIFFICULTY: ${difficulty.toUpperCase()}
+        
+        ${typeInstructions}
+        
+        Difficulty Guidelines:
+        ${difficultyInstructions[difficulty] || difficultyInstructions['intermediate']}
+        ${customInstructions ? `
+        USER'S CUSTOM INSTRUCTIONS (IMPORTANT - Follow these carefully):
+        ${customInstructions}
+        ` : ''}
+        IMPORTANT RULES:
+        1. Write questions in the SAME language as the Topic.
+        2. Each question must have a unique "id" starting from 1.
+        3. Questions should be clear and unambiguous.
+        4. Explanations should be concise but informative.
+        5. Correct answers must be accurate and verifiable.
+        6. RANDOMIZE the position of the correct answer! Do NOT always put the correct answer as the first option.
+           Mix it up - sometimes put correct answer in position 1, sometimes position 2, 3, or 4.
+        
+        Return ONLY a valid JSON array. NO markdown formatting.
+        
+        Example format:
+        ${formatExample}
+        
+        Generate ${numQuestions} questions now:
+      `;
     } else {
       // Default explanation - Multi-card format
       prompt = `

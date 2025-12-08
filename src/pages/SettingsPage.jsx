@@ -1,27 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, Bell, Moon, Info, HelpCircle, Trash2, ChevronRight, AlertTriangle, Check, Loader, ArrowLeft } from 'lucide-react';
+import { X, User, Lock, Moon, Sun, Trash2, Settings, Globe, Check, Loader, Camera, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { getAvatarUrl } from '../utils/avatarUtils';
 import './SettingsPage.css';
-import './AvatarUpload.css';
 
 const SettingsPage = () => {
     const navigate = useNavigate();
     const { user, profile, updateProfile, updatePassword, deleteAccount, uploadAvatar } = useAuth();
-    const { t } = useLanguage();
+    const { t, language, setLanguage } = useLanguage();
     const { theme, toggleTheme } = useTheme();
-    const [activeView, setActiveView] = useState('main'); // 'main', 'profile', 'password', 'delete'
-
-    console.log('SettingsPage Debug:', {
-        profile,
-        user,
-        avatarUrl: getAvatarUrl(profile || user),
-        profileAvatar: profile?.avatar_url
-    });
-
+    const [activeMenu, setActiveMenu] = useState('general');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -32,8 +23,6 @@ const SettingsPage = () => {
         confirmPassword: ''
     });
     const [deleteConfirm, setDeleteConfirm] = useState('');
-    const [avatarFile, setAvatarFile] = useState(null);
-    const [avatarPreview, setAvatarPreview] = useState(null);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
     const handleUpdateProfile = async (e) => {
@@ -45,10 +34,7 @@ const SettingsPage = () => {
 
         if (success) {
             setMessage({ type: 'success', text: 'Profile updated successfully!' });
-            setTimeout(() => {
-                setMessage({ type: '', text: '' });
-                setActiveView('main');
-            }, 2000);
+            setTimeout(() => setMessage({ type: '', text: '' }), 3000);
         } else {
             setMessage({ type: 'error', text: error?.message || 'Failed to update profile' });
         }
@@ -74,10 +60,7 @@ const SettingsPage = () => {
         if (success) {
             setMessage({ type: 'success', text: 'Password updated successfully!' });
             setPasswordData({ newPassword: '', confirmPassword: '' });
-            setTimeout(() => {
-                setMessage({ type: '', text: '' });
-                setActiveView('main');
-            }, 2000);
+            setTimeout(() => setMessage({ type: '', text: '' }), 3000);
         } else {
             setMessage({ type: 'error', text: error?.message || 'Failed to update password' });
         }
@@ -99,52 +82,36 @@ const SettingsPage = () => {
         }
     };
 
-    const handleAvatarChange = (e) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            // Validate file size (2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                setMessage({ type: 'error', text: 'File size must be less than 2MB' });
-                return;
-            }
+    const handleAvatarChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-            // Validate file type
-            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                setMessage({ type: 'error', text: 'File must be an image (JPEG, PNG, or WebP)' });
-                return;
-            }
+        if (!file.type.startsWith('image/')) {
+            setMessage({ type: 'error', text: 'Please select an image file' });
+            return;
+        }
 
-            setAvatarFile(file);
-            // Create preview
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setAvatarPreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+        if (file.size > 5 * 1024 * 1024) {
+            setMessage({ type: 'error', text: 'Image size should be less than 5MB' });
+            return;
+        }
+
+        try {
+            setUploadingAvatar(true);
             setMessage({ type: '', text: '' });
+
+            const { success, error } = await uploadAvatar(file);
+
+            if (success) {
+                setMessage({ type: 'success', text: 'Profile photo updated!' });
+            } else {
+                setMessage({ type: 'error', text: error?.message || 'Failed to upload avatar' });
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: 'An unexpected error occurred' });
+        } finally {
+            setUploadingAvatar(false);
         }
-    };
-
-    const handleAvatarUpload = async () => {
-        if (!avatarFile) return;
-
-        setUploadingAvatar(true);
-        setMessage({ type: '', text: '' });
-
-        const { success, error } = await uploadAvatar(avatarFile);
-
-        if (success) {
-            setMessage({ type: 'success', text: 'Avatar uploaded successfully!' });
-            setAvatarFile(null);
-            setAvatarPreview(null);
-            setTimeout(() => {
-                setMessage({ type: '', text: '' });
-            }, 3000);
-        } else {
-            setMessage({ type: 'error', text: error?.message || 'Failed to upload avatar' });
-        }
-        setUploadingAvatar(false);
     };
 
     const getInitials = () => {
@@ -154,285 +121,246 @@ const SettingsPage = () => {
         return user?.email?.charAt(0).toUpperCase() || 'U';
     };
 
-    const handleBack = () => {
-        if (activeView !== 'main') {
-            setActiveView('main');
-            setMessage({ type: '', text: '' });
-        } else {
-            navigate('/');
-        }
-    };
+    const menuItems = [
+        { id: 'general', icon: Settings, label: 'General' },
+        { id: 'profile', icon: User, label: 'Profile' },
+        { id: 'security', icon: Lock, label: 'Security' },
+        { id: 'theme', icon: theme === 'dark' ? Moon : Sun, label: 'Appearance' },
+        { id: 'account', icon: Trash2, label: 'Account', danger: true },
+    ];
 
-    return (
-        <div className="settings-page-container">
-            <div className="settings-page-content">
-                {/* Header */}
-                <div className="settings-header-page">
-                    <button onClick={handleBack} className="back-btn-page">
-                        <ArrowLeft size={24} />
-                    </button>
-                    <h2>{activeView === 'main' ? 'Settings' :
-                        activeView === 'profile' ? 'Edit Profile' :
-                            activeView === 'password' ? 'Change Password' :
-                                activeView === 'delete' ? 'Delete Account' : 'Settings'}</h2>
-                    <div className="header-spacer"></div> {/* To center title */}
-                </div>
+    const renderContent = () => {
+        switch (activeMenu) {
+            case 'general':
+                return (
+                    <div className="settings-panel">
+                        <h2 className="panel-title">General</h2>
 
-                {/* Main View */}
-                {activeView === 'main' && (
-                    <div className="settings-main-view">
-                        {/* User Profile Card */}
-                        <div className="settings-card user-card" onClick={() => setActiveView('profile')}>
-                            <div className="user-info">
-                                <div className="user-avatar-settings">
-                                    {getAvatarUrl(profile || user) ? (
-                                        <img
-                                            src={getAvatarUrl(profile || user)}
-                                            alt="Profile"
-                                            className="avatar-image-settings"
-                                        />
-                                    ) : (
-                                        getInitials()
-                                    )}
-                                </div>
-                                <div className="user-details">
-                                    <h3>{profile?.display_name || 'User'}</h3>
-                                    <p>{user?.email}</p>
-                                </div>
+                        <div className="settings-option">
+                            <div className="option-header">
+                                <span className="option-title">Language</span>
+                                <span className="option-description">Select your preferred language</span>
                             </div>
-                            <ChevronRight size={20} className="chevron-icon" />
+                            <select
+                                className="settings-select"
+                                value={language}
+                                onChange={(e) => setLanguage(e.target.value)}
+                            >
+                                <option value="en">English</option>
+                                <option value="id">Bahasa Indonesia</option>
+                            </select>
                         </div>
 
-                        {/* Other Settings Section */}
-                        <div className="settings-section">
-                            <h4 className="section-title">Other settings</h4>
-
-                            <div className="settings-card-group">
-                                <button className="settings-card-item" onClick={() => {
-                                    setActiveView('password');
-                                    setMessage({ type: '', text: '' });
-                                }}>
-                                    <div className="card-item-left">
-                                        <Lock size={20} />
-                                        <span>Password</span>
-                                    </div>
-                                    <ChevronRight size={20} className="chevron-icon" />
-                                </button>
-
-                                <button className="settings-card-item disabled">
-                                    <div className="card-item-left">
-                                        <Bell size={20} />
-                                        <span>Notifications</span>
-                                    </div>
-                                    <ChevronRight size={20} className="chevron-icon" />
-                                </button>
-
-                                <button className="settings-card-item" onClick={toggleTheme}>
-                                    <div className="card-item-left">
-                                        <Moon size={20} />
-                                        <span>Dark mode</span>
-                                    </div>
-                                    <div className="toggle-switch">
-                                        <input
-                                            type="checkbox"
-                                            checked={theme === 'dark'}
-                                            onChange={toggleTheme}
-                                            id="dark-mode-toggle"
-                                        />
-                                        <label htmlFor="dark-mode-toggle"></label>
-                                    </div>
-                                </button>
+                        <div className="settings-option">
+                            <div className="option-header">
+                                <span className="option-title">App Version</span>
+                                <span className="option-description">Current version of Nue Learning</span>
                             </div>
-                        </div>
-
-                        {/* Additional Settings Section */}
-                        <div className="settings-section">
-                            <div className="settings-card-group">
-                                <button className="settings-card-item disabled">
-                                    <div className="card-item-left">
-                                        <Info size={20} />
-                                        <span>About application</span>
-                                    </div>
-                                    <ChevronRight size={20} className="chevron-icon" />
-                                </button>
-
-                                <button className="settings-card-item disabled">
-                                    <div className="card-item-left">
-                                        <HelpCircle size={20} />
-                                        <span>Help/FAQ</span>
-                                    </div>
-                                    <ChevronRight size={20} className="chevron-icon" />
-                                </button>
-
-                                <button className="settings-card-item danger" onClick={() => {
-                                    setActiveView('delete');
-                                    setMessage({ type: '', text: '' });
-                                }}>
-                                    <div className="card-item-left">
-                                        <Trash2 size={20} />
-                                        <span>Deactivate my account</span>
-                                    </div>
-                                    <ChevronRight size={20} className="chevron-icon" />
-                                </button>
-                            </div>
+                            <span className="option-value">v1.0.0</span>
                         </div>
                     </div>
-                )}
+                );
 
-                {/* Profile Edit View */}
-                {activeView === 'profile' && (
-                    <div className="settings-detail-page">
+            case 'profile':
+                return (
+                    <div className="settings-panel">
+                        <h2 className="panel-title">Profile</h2>
+
                         {message.text && (
-                            <div className={`settings-message-page ${message.type}`}>
+                            <div className={`settings-alert ${message.type}`}>
                                 {message.type === 'success' ? <Check size={16} /> : <AlertTriangle size={16} />}
                                 <span>{message.text}</span>
                             </div>
                         )}
 
-                        {/* Avatar Upload Section */}
-                        <div className="avatar-upload-section">
-                            <div className="avatar-upload-container">
-                                <div className="avatar-display">
-                                    {avatarPreview ? (
-                                        <img src={avatarPreview} alt="Avatar preview" className="avatar-preview-img" />
-                                    ) : getAvatarUrl(profile || user) ? (
-                                        <img src={getAvatarUrl(profile || user)} alt="Current avatar" className="avatar-preview-img" />
-                                    ) : (
-                                        <div className="avatar-placeholder">
-                                            {getInitials()}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="avatar-upload-controls">
-                                    <input
-                                        type="file"
-                                        id="avatar-upload"
-                                        accept="image/jpeg,image/png,image/webp"
-                                        onChange={handleAvatarChange}
-                                        className="avatar-input-hidden"
-                                    />
-                                    <label htmlFor="avatar-upload" className="avatar-upload-btn">
-                                        Choose Photo
-                                    </label>
-                                    {avatarFile && (
-                                        <button
-                                            type="button"
-                                            onClick={handleAvatarUpload}
-                                            className="avatar-save-btn"
-                                            disabled={uploadingAvatar}
-                                        >
-                                            {uploadingAvatar ? <Loader className="spin" size={16} /> : 'Upload'}
-                                        </button>
-                                    )}
-                                </div>
-                                <p className="avatar-hint">JPG, PNG or WebP. Max size 2MB.</p>
+                        <div className="avatar-section">
+                            <div className="avatar-preview">
+                                {getAvatarUrl(profile || user) ? (
+                                    <img src={getAvatarUrl(profile || user)} alt={profile?.display_name || 'User'} />
+                                ) : (
+                                    <div className="avatar-initials">{getInitials()}</div>
+                                )}
+                                <label className="avatar-edit-btn" htmlFor="avatar-input">
+                                    {uploadingAvatar ? <Loader className="spin" size={16} /> : <Camera size={16} />}
+                                </label>
+                                <input
+                                    type="file"
+                                    id="avatar-input"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                    disabled={uploadingAvatar}
+                                    hidden
+                                />
                             </div>
+                            <p className="avatar-hint">Click to change photo</p>
                         </div>
 
-                        <form onSubmit={handleUpdateProfile} className="settings-form-page">
-                            <div className="form-group-page">
+                        <form onSubmit={handleUpdateProfile} className="settings-form">
+                            <div className="form-field">
                                 <label>Display Name</label>
                                 <input
                                     type="text"
                                     value={displayName}
                                     onChange={(e) => setDisplayName(e.target.value)}
-                                    placeholder="Enter your name"
-                                    className="settings-input-page"
+                                    placeholder="What should we call you?"
                                 />
                             </div>
-                            <div className="form-group-page">
+                            <div className="form-field">
                                 <label>Email</label>
                                 <input
                                     type="email"
                                     value={user?.email}
                                     disabled
-                                    className="settings-input-page disabled"
+                                    className="disabled"
                                 />
-                                <span className="input-hint-page">Email cannot be changed</span>
+                                <span className="field-hint">Email cannot be changed</span>
                             </div>
-                            <button type="submit" className="save-btn-page" disabled={loading}>
-                                {loading ? <Loader className="spin" size={18} /> : 'Save Changes'}
+                            <button type="submit" className="save-btn" disabled={loading}>
+                                {loading ? <Loader className="spin" size={16} /> : 'Save Changes'}
                             </button>
                         </form>
                     </div>
-                )}
+                );
 
-                {/* Password Edit View */}
-                {activeView === 'password' && (
-                    <div className="settings-detail-page">
+            case 'security':
+                return (
+                    <div className="settings-panel">
+                        <h2 className="panel-title">Security</h2>
+
                         {message.text && (
-                            <div className={`settings-message-page ${message.type}`}>
+                            <div className={`settings-alert ${message.type}`}>
                                 {message.type === 'success' ? <Check size={16} /> : <AlertTriangle size={16} />}
                                 <span>{message.text}</span>
                             </div>
                         )}
 
-                        <form onSubmit={handleUpdatePassword} className="settings-form-page">
-                            <div className="form-group-page">
+                        <form onSubmit={handleUpdatePassword} className="settings-form">
+                            <div className="form-field">
                                 <label>New Password</label>
                                 <input
                                     type="password"
                                     value={passwordData.newPassword}
                                     onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                                     placeholder="Enter new password (min. 8 characters)"
-                                    className="settings-input-page"
                                 />
                             </div>
-                            <div className="form-group-page">
+                            <div className="form-field">
                                 <label>Confirm Password</label>
                                 <input
                                     type="password"
                                     value={passwordData.confirmPassword}
                                     onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                                     placeholder="Confirm new password"
-                                    className="settings-input-page"
                                 />
                             </div>
-                            <button type="submit" className="save-btn-page" disabled={loading}>
-                                {loading ? <Loader className="spin" size={18} /> : 'Update Password'}
+                            <button type="submit" className="save-btn" disabled={loading}>
+                                {loading ? <Loader className="spin" size={16} /> : 'Update Password'}
                             </button>
                         </form>
                     </div>
-                )}
+                );
 
-                {/* Delete Account View */}
-                {activeView === 'delete' && (
-                    <div className="settings-detail-page">
-                        <div className="danger-warning-page">
-                            <AlertTriangle size={24} />
-                            <div>
-                                <h4>Warning: This action is irreversible</h4>
-                                <p>All your data, including history and preferences, will be permanently deleted.</p>
+            case 'theme':
+                return (
+                    <div className="settings-panel">
+                        <h2 className="panel-title">Appearance</h2>
+
+                        <div className="settings-option clickable" onClick={toggleTheme}>
+                            <div className="option-header">
+                                <span className="option-title">Dark Mode</span>
+                                <span className="option-description">Toggle between light and dark theme</span>
+                            </div>
+                            <div className="toggle-switch">
+                                <input
+                                    type="checkbox"
+                                    checked={theme === 'dark'}
+                                    onChange={toggleTheme}
+                                    id="theme-toggle"
+                                />
+                                <label htmlFor="theme-toggle"></label>
                             </div>
                         </div>
+                    </div>
+                );
+
+            case 'account':
+                return (
+                    <div className="settings-panel">
+                        <h2 className="panel-title danger">Account</h2>
 
                         {message.text && (
-                            <div className={`settings-message-page ${message.type}`}>
-                                <AlertTriangle size={16} />
+                            <div className={`settings-alert ${message.type}`}>
+                                {message.type === 'success' ? <Check size={16} /> : <AlertTriangle size={16} />}
                                 <span>{message.text}</span>
                             </div>
                         )}
 
-                        <div className="form-group-page">
-                            <label>Type DELETE to confirm</label>
-                            <input
-                                type="text"
-                                value={deleteConfirm}
-                                onChange={(e) => setDeleteConfirm(e.target.value)}
-                                placeholder="DELETE"
-                                className="settings-input-page danger-input"
-                            />
-                        </div>
+                        <div className="danger-zone">
+                            <div className="danger-warning">
+                                <AlertTriangle size={24} />
+                                <div>
+                                    <h4>Delete Account</h4>
+                                    <p>This action is irreversible. All your data will be permanently deleted.</p>
+                                </div>
+                            </div>
 
-                        <button
-                            onClick={handleDeleteAccount}
-                            className="delete-btn-page"
-                            disabled={loading || deleteConfirm !== 'DELETE'}
-                        >
-                            {loading ? <Loader className="spin" size={18} /> : 'Delete Account'}
-                        </button>
+                            <div className="form-field">
+                                <label>Type "DELETE" to confirm</label>
+                                <input
+                                    type="text"
+                                    value={deleteConfirm}
+                                    onChange={(e) => setDeleteConfirm(e.target.value)}
+                                    placeholder="DELETE"
+                                    className="danger-input"
+                                />
+                            </div>
+                            <button
+                                onClick={handleDeleteAccount}
+                                className="delete-btn"
+                                disabled={loading || deleteConfirm !== 'DELETE'}
+                            >
+                                {loading ? <Loader className="spin" size={16} /> : 'Delete My Account'}
+                            </button>
+                        </div>
                     </div>
-                )}
+                );
+
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <div className="settings-page-overlay">
+            <div className="settings-page-modal">
+                {/* Close Button */}
+                <button className="modal-close-btn" onClick={() => navigate(-1)}>
+                    <X size={20} />
+                </button>
+
+                {/* Sidebar */}
+                <div className="settings-sidebar">
+                    <nav className="settings-nav">
+                        {menuItems.map((item) => (
+                            <button
+                                key={item.id}
+                                className={`nav-item ${activeMenu === item.id ? 'active' : ''} ${item.danger ? 'danger' : ''}`}
+                                onClick={() => {
+                                    setActiveMenu(item.id);
+                                    setMessage({ type: '', text: '' });
+                                }}
+                            >
+                                <item.icon size={18} />
+                                <span>{item.label}</span>
+                            </button>
+                        ))}
+                    </nav>
+                </div>
+
+                {/* Content */}
+                <div className="settings-content">
+                    {renderContent()}
+                </div>
             </div>
         </div>
     );

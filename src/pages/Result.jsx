@@ -404,7 +404,7 @@ const Result = () => {
             <footer className="result-footer">
                 <button
                     onClick={handleBack}
-                    className="nav-button"
+                    className="nav-button back-btn"
                     disabled={generating}
                 >
                     <ArrowLeft size={20} />
@@ -463,7 +463,7 @@ const Result = () => {
 
                 <button
                     onClick={handleNext}
-                    className={`nav-button ${showFeedback ? 'hidden' : ''}`}
+                    className={`nav-button next-btn ${showFeedback ? 'hidden' : ''}`}
                     style={{ visibility: showFeedback ? 'hidden' : 'visible' }}
                     disabled={generating}
                 >
