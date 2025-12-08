@@ -165,7 +165,7 @@ const Sidebar = ({ isOpen, toggle }) => {
             >
                 <div className="sidebar-header">
                     <div className="sidebar-brand">
-                        <img src="/logo-koru.png" alt="Koru" className="sidebar-logo" />
+                        <img src="/logo-koru.svg" alt="Koru" className="sidebar-logo" />
                         <span className="sidebar-app-name">Koru</span>
                     </div>
                     <button

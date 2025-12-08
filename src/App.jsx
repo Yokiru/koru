@@ -29,19 +29,15 @@ export const SettingsContext = React.createContext();
 // Create context for plan modal
 export const PlanContext = React.createContext();
 
-// Simple loading fallback
+// Simple loading fallback - empty to avoid flash of "Loading..." text
 const PageLoader = () => (
   <div style={{
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh',
-    background: 'var(--bg-primary)',
-    color: 'var(--text-secondary)',
-    fontSize: '1rem'
-  }}>
-    Loading...
-  </div>
+    background: 'var(--bg-primary)'
+  }} />
 );
 
 function AppContent() {

@@ -5,15 +5,17 @@ import { ArrowUp, Brain } from 'lucide-react';
 import './Home.css';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
+import Skeleton from '../components/Skeleton';
 
 const Home = ({ isSidebarOpen }) => {
     const { t, language } = useLanguage();
-    const { isAuthenticated, profile, user } = useAuth();
+    const { isAuthenticated, profile, user, loading: authLoading } = useAuth();
     const [greeting, setGreeting] = useState("");
     const [query, setQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [quizMode, setQuizMode] = useState(false);
     const [showTrialModal, setShowTrialModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const location = useLocation();
     const navigate = useNavigate();
     const lastLanguageRef = useRef(null);
@@ -25,6 +27,12 @@ const Home = ({ isSidebarOpen }) => {
         '';
 
     useEffect(() => {
+        // Wait for auth to finish loading before generating greeting
+        if (authLoading) {
+            setIsLoading(true);
+            return;
+        }
+
         // Cache key includes user to regenerate when user changes
         const cacheKey = `${language}_${userName || 'guest'}`;
         const storedKey = sessionStorage.getItem('home_greeting_key');
@@ -35,6 +43,7 @@ const Home = ({ isSidebarOpen }) => {
             // Use stored values
             setGreeting(storedGreeting);
             setSuggestions(JSON.parse(storedSuggestions));
+            setIsLoading(false);
             return;
         }
 
@@ -64,7 +73,9 @@ const Home = ({ isSidebarOpen }) => {
         sessionStorage.setItem('home_greeting_key', cacheKey);
         sessionStorage.setItem('home_greeting', randomGreeting);
         sessionStorage.setItem('home_suggestions', JSON.stringify(selectedSuggestions));
-    }, [language, t, userName]);
+
+        setIsLoading(false);
+    }, [language, t, userName, authLoading]);
 
     const checkTrialLimit = () => {
         if (isAuthenticated) return true;
@@ -98,25 +109,42 @@ const Home = ({ isSidebarOpen }) => {
     return (
         <div className="home-container">
             <div className="home-content-wrapper">
-                <h1 className="hero-title">{greeting}</h1>
+                {isLoading ? (
+                    <>
+                        <div className="skeleton-greeting">
+                            <Skeleton width="60%" height="48px" />
+                        </div>
+                        <div className="suggestions-container skeleton-suggestions">
+                            <Skeleton width="140px" height="42px" variant="button" />
+                            <Skeleton width="180px" height="42px" variant="button" />
+                            <Skeleton width="160px" height="42px" variant="button" />
+                            <Skeleton width="200px" height="42px" variant="button" />
+                            <Skeleton width="150px" height="42px" variant="button" />
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <h1 className="hero-title">{greeting}</h1>
 
-                <div className="suggestions-container">
-                    <AnimatePresence>
-                        {suggestions.map((suggestion, index) => (
-                            <motion.button
-                                key={index}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="suggestion-chip"
-                                onClick={() => handleSuggestionClick(suggestion)}
-                            >
-                                {suggestion}
-                            </motion.button>
-                        ))}
-                    </AnimatePresence>
-                </div>
+                        <div className="suggestions-container">
+                            <AnimatePresence>
+                                {suggestions.map((suggestion, index) => (
+                                    <motion.button
+                                        key={index}
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        transition={{ delay: index * 0.1 }}
+                                        className="suggestion-chip"
+                                        onClick={() => handleSuggestionClick(suggestion)}
+                                    >
+                                        {suggestion}
+                                    </motion.button>
+                                ))}
+                            </AnimatePresence>
+                        </div>
+                    </>
+                )}
                 <div className="content-fade-overlay"></div>
             </div>
 
@@ -202,3 +230,4 @@ const Home = ({ isSidebarOpen }) => {
 };
 
 export default Home;
+
