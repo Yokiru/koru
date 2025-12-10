@@ -6,10 +6,17 @@ import './Home.css';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import Skeleton from '../components/Skeleton';
+import {
+    STORAGE_KEY_GREETING,
+    STORAGE_KEY_GREETING_KEY,
+    STORAGE_KEY_SUGGESTIONS,
+    STORAGE_KEY_TRIAL,
+    MAX_SUGGESTIONS
+} from '../utils/constants';
 
 const Home = ({ isSidebarOpen }) => {
     const { t, language } = useLanguage();
-    const { isAuthenticated, profile, user, loading: authLoading } = useAuth();
+    const { isAuthenticated, profile, user } = useAuth();
     const [greeting, setGreeting] = useState("");
     const [query, setQuery] = useState("");
     const [suggestions, setSuggestions] = useState([]);
@@ -27,17 +34,11 @@ const Home = ({ isSidebarOpen }) => {
         '';
 
     useEffect(() => {
-        // Wait for auth to finish loading before generating greeting
-        if (authLoading) {
-            setIsLoading(true);
-            return;
-        }
-
         // Cache key includes user to regenerate when user changes
         const cacheKey = `${language}_${userName || 'guest'}`;
-        const storedKey = sessionStorage.getItem('home_greeting_key');
-        const storedGreeting = sessionStorage.getItem('home_greeting');
-        const storedSuggestions = sessionStorage.getItem('home_suggestions');
+        const storedKey = sessionStorage.getItem(STORAGE_KEY_GREETING_KEY);
+        const storedGreeting = sessionStorage.getItem(STORAGE_KEY_GREETING);
+        const storedSuggestions = sessionStorage.getItem(STORAGE_KEY_SUGGESTIONS);
 
         if (storedKey === cacheKey && storedGreeting && storedSuggestions) {
             // Use stored values
@@ -66,28 +67,28 @@ const Home = ({ isSidebarOpen }) => {
         const defaultSuggestions = t('home.suggestions');
         const suggestionsList = Array.isArray(defaultSuggestions) ? defaultSuggestions : [];
         const shuffled = [...suggestionsList].sort(() => 0.5 - Math.random());
-        const selectedSuggestions = shuffled.slice(0, 5);
+        const selectedSuggestions = shuffled.slice(0, MAX_SUGGESTIONS);
         setSuggestions(selectedSuggestions);
 
         // Store in sessionStorage
-        sessionStorage.setItem('home_greeting_key', cacheKey);
-        sessionStorage.setItem('home_greeting', randomGreeting);
-        sessionStorage.setItem('home_suggestions', JSON.stringify(selectedSuggestions));
+        sessionStorage.setItem(STORAGE_KEY_GREETING_KEY, cacheKey);
+        sessionStorage.setItem(STORAGE_KEY_GREETING, randomGreeting);
+        sessionStorage.setItem(STORAGE_KEY_SUGGESTIONS, JSON.stringify(selectedSuggestions));
 
         setIsLoading(false);
-    }, [language, t, userName, authLoading]);
+    }, [language, t, userName]);
 
     const checkTrialLimit = () => {
         if (isAuthenticated) return true;
 
-        const trialUsed = localStorage.getItem('guest_trial_used');
+        const trialUsed = localStorage.getItem(STORAGE_KEY_TRIAL);
         if (trialUsed === 'true') {
             setShowTrialModal(true);
             return false;
         }
 
         // Mark trial as used
-        localStorage.setItem('guest_trial_used', 'true');
+        localStorage.setItem(STORAGE_KEY_TRIAL, 'true');
         return true;
     };
 

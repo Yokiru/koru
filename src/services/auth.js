@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { AUTH_TIMEOUT_MS, SESSION_TIMEOUT_MS, PROFILE_TIMEOUT_MS } from '../utils/constants';
 
 /**
  * Authentication Service
@@ -82,7 +83,7 @@ export const authService = {
             console.log('🕵️ authService: signIn started');
             // Create a timeout promise
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Sign In Timeout')), 10000) // 10s timeout for login
+                setTimeout(() => reject(new Error('Sign In Timeout')), AUTH_TIMEOUT_MS)
             );
 
             const { data, error } = await Promise.race([
@@ -128,7 +129,7 @@ export const authService = {
 
             // Create a timeout promise
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Timeout')), 5000)
+                setTimeout(() => reject(new Error('Timeout')), SESSION_TIMEOUT_MS)
             );
 
             // Race getUser against timeout
@@ -155,7 +156,7 @@ export const authService = {
 
                 // Also race getSession against timeout
                 const sessionTimeoutPromise = new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Session Timeout')), 2000)
+                    setTimeout(() => reject(new Error('Session Timeout')), PROFILE_TIMEOUT_MS)
                 );
 
                 const { data: { session } } = await Promise.race([
@@ -205,9 +206,9 @@ export const authService = {
         try {
             console.log('🕵️ authService: getUserProfile started');
 
-            // Create a timeout promise - reduced to 2s for faster UX
+            // Create a timeout promise
             const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error('Profile Load Timeout')), 2000)
+                setTimeout(() => reject(new Error('Profile Load Timeout')), PROFILE_TIMEOUT_MS)
             );
 
             const { data, error } = await Promise.race([

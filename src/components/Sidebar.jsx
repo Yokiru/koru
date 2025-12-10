@@ -8,8 +8,7 @@ import { supabase } from '../services/supabase';
 import ProfileSection from './ProfileSection';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
-
-const MAX_PINNED = 5;
+import { MAX_PINNED_ITEMS } from '../utils/constants';
 
 const Sidebar = ({ isOpen, toggle }) => {
     const [history, setHistory] = useState([]);
@@ -94,8 +93,8 @@ const Sidebar = ({ isOpen, toggle }) => {
 
         // Check max pinned limit
         const pinnedCount = history.filter(h => h.is_pinned).length;
-        if (!item.is_pinned && pinnedCount >= MAX_PINNED) {
-            alert(`Maksimal ${MAX_PINNED} item yang bisa disematkan`);
+        if (!item.is_pinned && pinnedCount >= MAX_PINNED_ITEMS) {
+            alert(`Maksimal ${MAX_PINNED_ITEMS} item yang bisa disematkan`);
             return;
         }
 

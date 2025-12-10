@@ -22,6 +22,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 import './App.css';
+import { AUTH_ROUTES } from './utils/constants';
 
 // Create context for settings modal
 export const SettingsContext = React.createContext();
@@ -54,7 +55,7 @@ function AppContent() {
   const closePlan = () => setIsPlanOpen(false);
 
   // Hide sidebar on auth pages
-  const hideSidebar = ['/login', '/register', '/forgot-password', '/reset-password'].includes(location.pathname);
+  const hideSidebar = AUTH_ROUTES.includes(location.pathname);
 
   return (
     <SettingsContext.Provider value={{ openSettings, closeSettings, isSettingsOpen }}>
