@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, User, Lock, Moon, Sun, Trash2, Settings, Globe, Check, Loader, Camera, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, User, Lock, Moon, Sun, Trash2, Settings, Globe, Check, Loader, Camera, AlertTriangle, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -7,11 +7,13 @@ import './SettingsModal.css';
 
 const SettingsModal = ({ isOpen, onClose }) => {
     const { user, profile, updateProfile, updatePassword, deleteAccount, uploadAvatar } = useAuth();
-    const { t, language, setLanguage } = useLanguage();
+    const { t, language, changeLanguage } = useLanguage();
     const { theme, toggleTheme } = useTheme();
     const [activeMenu, setActiveMenu] = useState('general');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
+    const [isLangOpen, setIsLangOpen] = useState(false);
+    const langDropdownRef = useRef(null);
 
     // Form states
     const [displayName, setDisplayName] = useState(profile?.display_name || '');
@@ -21,6 +23,18 @@ const SettingsModal = ({ isOpen, onClose }) => {
     });
     const [deleteConfirm, setDeleteConfirm] = useState('');
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+    // Close language dropdown on click outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (langDropdownRef.current && !langDropdownRef.current.contains(event.target)) {
+                setIsLangOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     if (!isOpen) return null;
 
@@ -140,14 +154,43 @@ const SettingsModal = ({ isOpen, onClose }) => {
                                 <span className="option-title">Language</span>
                                 <span className="option-description">Select your preferred language</span>
                             </div>
-                            <select
-                                className="settings-select"
-                                value={language}
-                                onChange={(e) => setLanguage(e.target.value)}
-                            >
-                                <option value="en">English</option>
-                                <option value="id">Bahasa Indonesia</option>
-                            </select>
+                            <div className="lang-dropdown" ref={langDropdownRef}>
+                                <button
+                                    className={`lang-dropdown-btn ${isLangOpen ? 'active' : ''}`}
+                                    onClick={() => setIsLangOpen(!isLangOpen)}
+                                    type="button"
+                                >
+                                    <span className="lang-label">
+                                        {language === 'en' ? 'English' : 'Bahasa Indonesia'}
+                                    </span>
+                                    <ChevronDown size={16} className={`dropdown-chevron ${isLangOpen ? 'rotate' : ''}`} />
+                                </button>
+
+                                {isLangOpen && (
+                                    <div className="lang-dropdown-menu">
+                                        <button
+                                            className={`lang-option ${language === 'en' ? 'selected' : ''}`}
+                                            onClick={() => {
+                                                changeLanguage('en');
+                                                setIsLangOpen(false);
+                                            }}
+                                        >
+                                            <span>English</span>
+                                            {language === 'en' && <Check size={14} />}
+                                        </button>
+                                        <button
+                                            className={`lang-option ${language === 'id' ? 'selected' : ''}`}
+                                            onClick={() => {
+                                                changeLanguage('id');
+                                                setIsLangOpen(false);
+                                            }}
+                                        >
+                                            <span>Bahasa Indonesia</span>
+                                            {language === 'id' && <Check size={14} />}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 );

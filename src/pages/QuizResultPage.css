@@ -82,12 +82,13 @@
     color: #a78bfa;
 }
 
-.hero-title {
+.quiz-result-page .hero-title {
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--text-primary);
     margin: 0 0 0.75rem 0;
     letter-spacing: -0.02em;
+    font-style: normal;
 }
 
 .hero-subtitle {
@@ -465,7 +466,7 @@
         margin-bottom: 1.5rem;
     }
 
-    .hero-title {
+    .quiz-result-page .hero-title {
         font-size: 2rem;
     }
 

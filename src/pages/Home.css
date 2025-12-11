@@ -53,6 +53,7 @@
     margin-left: auto;
     margin-right: auto;
     font-weight: 400 !important;
+    font-style: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
