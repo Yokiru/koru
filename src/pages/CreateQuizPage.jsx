@@ -4,7 +4,7 @@ import { BookOpen, Layers, BarChart, Hash, HelpCircle, ArrowLeft, ChevronUp, Che
 import { useAuth } from '../contexts/AuthContext';
 import CustomSelect from '../components/CustomSelect';
 import { saveQuiz } from '../services/quizService';
-import { generateQuizQuestions } from '../services/gemini';
+import { generateQuizQuestions, refineQuizTitle } from '../services/gemini';
 import './CreateQuizPage.css';
 
 const CreateQuizPage = () => {
@@ -56,11 +56,16 @@ const CreateQuizPage = () => {
         setError(null);
 
         try {
-            // Generate quiz questions using AI
-            console.log('Generating quiz with AI...', formData);
+            // First, refine the topic title using AI
+            console.log('Refining quiz title...', formData.topic);
+            const refinedTopic = await refineQuizTitle(formData.topic);
+            console.log('Refined topic:', refinedTopic);
+
+            // Generate quiz questions using AI with refined topic
+            console.log('Generating quiz with AI...', { ...formData, topic: refinedTopic });
 
             const questions = await generateQuizQuestions({
-                topic: formData.topic,
+                topic: formData.topic, // Use original for question generation
                 quizType: formData.type,
                 difficulty: formData.difficulty,
                 numQuestions: parseInt(formData.amount),
@@ -69,9 +74,9 @@ const CreateQuizPage = () => {
 
             console.log('AI Generated Questions:', questions);
 
-            // Build quiz data object
+            // Build quiz data object with refined topic as display title
             const quizData = {
-                topic: formData.topic,
+                topic: refinedTopic, // Use refined title for display
                 type: formData.type === 'multiple-choice' ? 'Multiple Choice' :
                     formData.type === 'true-false' ? 'True/False' : 'Essay',
                 difficulty: formData.difficulty.charAt(0).toUpperCase() + formData.difficulty.slice(1),

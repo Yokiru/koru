@@ -60,6 +60,34 @@ export default async function handler(req, res) {
               
               DO NOT use markdown formatting like \`\`\`json. Just return the raw JSON object.
             `;
+    } else if (action === 'refine_title') {
+      prompt = `
+              You are a title refinement assistant.
+              
+              The user wants to create a quiz about: "${payload.topic}"
+              
+              Your task is to create a CLEANER, more CONCISE, and PROFESSIONAL title for this quiz.
+              
+              Rules:
+              1. Keep the essence/meaning of the original topic
+              2. Make it shorter if possible (max 50 characters ideal, max 80 characters absolute)
+              3. Use proper capitalization (Title Case)
+              4. Remove unnecessary words like "about", "regarding", "Quiz about", etc.
+              5. Make it sound like a professional quiz topic title
+              6. Write in the SAME language as the input
+              7. If the input is already clean and short, just return it with proper capitalization
+              
+              Examples:
+              - "apa itu bitcoin halving dan dampaknya pada pasar" → "Bitcoin Halving dan Dampaknya"
+              - "machine learning basics and how it works" → "Machine Learning Basics"
+              - "sejarah panjang kerajaan majapahit di indonesia" → "Sejarah Kerajaan Majapahit"
+              - "basic javascript programming tutorial" → "JavaScript Programming Basics"
+              
+              Return ONLY a JSON object with the refined title:
+              { "refinedTitle": "Your Refined Title Here" }
+              
+              DO NOT use markdown formatting. Just return the raw JSON object.
+            `;
     } else if (action === 'quiz') {
       const quizType = payload.quizType || 'multiple-choice';
       const difficulty = payload.difficulty || 'intermediate';

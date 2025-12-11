@@ -47,7 +47,7 @@
     font-size: 2rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 1rem 0;
 }
 
 .quiz-meta {
@@ -59,27 +59,28 @@
 
 .quiz-type-badge,
 .quiz-difficulty-badge {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 6px;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
     font-weight: 500;
+    background: transparent;
+    letter-spacing: 0.03em;
 }
 
 .quiz-type-badge {
-    background: rgba(247, 111, 83, 0.1);
     color: var(--accent);
-    border: 1px solid var(--accent);
+    border: 1.5px solid var(--accent);
+    text-transform: uppercase;
 }
 
 .quiz-difficulty-badge {
-    background: rgba(255, 255, 255, 0.05);
     color: var(--text-secondary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    text-transform: uppercase;
 }
 
 [data-theme="light"] .quiz-difficulty-badge {
-    background: rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1.5px solid rgba(0, 0, 0, 0.2);
 }
 
 /* Progress Section */
@@ -239,6 +240,8 @@
 
 .option-text {
     flex: 1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .quiz-option.selected {
@@ -514,6 +517,17 @@
 @media (max-width: 768px) {
     .quiz-take-page {
         padding: 1rem;
+        padding-top: 5.5rem;
+        padding-bottom: 2rem;
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
+
+    /* Icon button - NOT sticky on mobile */
+    .icon-button {
+        position: absolute;
     }
 
     .exit-btn {
@@ -524,15 +538,35 @@
 
     .quiz-header {
         margin-bottom: 1.5rem;
-        padding-top: 3rem;
+        padding-top: 0.5rem;
     }
 
+    .quiz-info {
+        position: relative;
+        padding: 0;
+        width: 100%;
+        margin-bottom: 2rem;
+    }
+
+    /* Allow text to wrap naturally on mobile */
     .quiz-topic {
         font-size: 1.5rem;
+        max-width: 100%;
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.3;
+    }
+
+    .quiz-content {
+        padding: 0;
     }
 
     .quiz-card {
-        padding: 1.5rem;
+        padding: 1.25rem;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
     }
 
     .quiz-question h2 {

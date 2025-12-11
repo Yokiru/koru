@@ -220,3 +220,38 @@ export const generateQuizQuestions = async ({ topic, quizType = 'multiple-choice
         throw error;
     }
 };
+
+/**
+ * Refine and improve a quiz title using AI
+ * @param {string} topic - The original topic/title entered by user
+ * @returns {Promise<string>} - Refined/improved title
+ */
+export const refineQuizTitle = async (topic) => {
+    try {
+        const text = await callGeminiAPI('refine_title', { topic });
+        console.log("Gemini Refine Title Response:", text);
+
+        // Clean up markdown code blocks if present
+        const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        // Match JSON object
+        const jsonMatch = cleanText.match(/\{.*\}/s);
+        const jsonString = jsonMatch ? jsonMatch[0] : cleanText;
+
+        try {
+            const result = JSON.parse(jsonString);
+            if (result.refinedTitle) {
+                return result.refinedTitle;
+            }
+            // Fallback to original if no refinedTitle
+            return topic;
+        } catch (e) {
+            console.warn("Refine title JSON parse failed, returning original", e);
+            return topic;
+        }
+    } catch (error) {
+        console.error("Error refining quiz title:", error);
+        // Return original topic if refining fails
+        return topic;
+    }
+};
